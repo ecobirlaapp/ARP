@@ -1,63 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoBirla | Login</title>
+    <title>EcoBirla - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Link to your shared stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { fontFamily: { inter: ['Inter', 'sans-serif'] } }
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
         }
     </script>
+    <style>
+        /* Add specific login page styles if needed */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+        }
+        .dark body {
+            background-color: #111827;
+        }
+        .form-container {
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
+<body class="dark:bg-gray-900">
 
-<body class="bg-gray-50 dark:bg-gray-900 font-inter">
-
-    <div class="min-h-screen flex flex-col items-center justify-center px-6">
-        <!-- Logo -->
-        <img src="https://i.ibb.co/d00b4v0n/Eco-Birla-2-modified.png" class="w-32 mb-6 drop-shadow-md">
-
-        <!-- Card -->
-        <div class="w-full max-w-sm bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
-            <h2 class="text-center text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">EcoBirla Login</h2>
-
-            <form id="loginForm" class="space-y-4">
-
-                <div>
-                    <label class="text-gray-600 dark:text-gray-300 text-sm font-medium">Student ID</label>
-                    <input type="text" id="studentId" minlength="7" maxlength="7" required
-                        placeholder="7-digit Student ID"
-                        class="w-full mt-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                               bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-green-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="text-gray-600 dark:text-gray-300 text-sm font-medium">Password</label>
-                    <input type="password" id="password" required placeholder="Enter your password"
-                        class="w-full mt-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                               bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-green-500 outline-none">
-                </div>
-
-                <p id="loginError" class="hidden text-red-600 dark:text-red-400 text-sm font-semibold mt-1"></p>
-
-                <button id="loginBtn"
-                    class="w-full py-3 rounded-lg bg-green-600 hover:bg-green-700 transition text-white font-semibold">
-                    Login
-                </button>
-            </form>
-
-            <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-5">A BKBNC Green Club Initiative</p>
+    <div class="form-container p-6">
+        <div class="text-center mb-8">
+            <img src="https://i.ibb.co/d00b4v0n/Eco-Birla-2-modified.png" class="w-24 h-24 mx-auto mb-4" alt="EcoBirla Logo">
+            <h1 class="text-3xl font-extrabold text-green-700 dark:text-green-500">EcoBirla</h1>
+            <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-1">
+                A BKBNC GREEN CLUB INITIATIVE
+            </p>
         </div>
+
+        <!-- Title -->
+        <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">Student Login</h2>
+
+        <!-- Error Message Display -->
+        <div id="auth-message" class="text-red-500 text-sm text-center mb-4 h-5"></div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="login-studentid" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Student ID (7 Digits)</label>
+                <input type="text" id="login-studentid" required pattern="\d{7}" maxlength="7" placeholder="e.g. 5207872" class="mt-1 block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-800 dark:text-white">
+            </div>
+            <div>
+                <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                <input type="password" id="login-password" required class="mt-1 block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-800 dark:text-white">
+            </div>
+            <button type="submit" id="login-button" class="w-full btn-eco-gradient text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:opacity-90 transition-transform active:scale-95 flex items-center justify-center">
+                <span class="btn-text">Login</span>
+                <i data-lucide="loader-circle" class="w-5 h-5 animate-spin hidden ml-2"></i>
+            </button>
+        </form>
+
     </div>
 
-    <!-- Scripts -->
-    <script type="module" src="./supabase-client.js"></script>
-    <script type="module" src="./login.js"></script>
-
+    <!-- Import Supabase client and login logic -->
+    <!-- Make sure to use type="module" for ES6 imports -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="supabase-client.js"></script>
+    <script type="module" src="login.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
