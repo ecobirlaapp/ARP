@@ -14,15 +14,15 @@ async function handleLogin(evt) {
 
     errorBox.classList.add("hidden");
 
-    if (studentId.length !== 7) {
-        return showError("Student ID must be 7 digits.");
+    if (!/^\d{7}$/.test(studentId)) {
+        return showError("Student ID must be exactly 7 digits.");
     }
 
     loginBtn.disabled = true;
-    loginBtn.innerText = "Logging in...";
+    loginBtn.innerText = "Verifying...";
 
-    // Student ID → Virtual Email Login
-    const email = `${studentId}@ecobirla.student`;
+    // Hidden Supabase email mapping
+    const email = `${studentId}@ecobirla.internal`;
 
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -36,10 +36,8 @@ async function handleLogin(evt) {
         return;
     }
 
-    console.log("Logged in user:", data.user);
-
-    // Redirect to main app
-    window.location.href = "index.html";
+    console.log("Logged in:", data.user);
+    window.location.href = "index.html"; // redirect to main app
 }
 
 function showError(message) {
