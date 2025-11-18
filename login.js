@@ -1,5 +1,5 @@
 // Import the Supabase client
-import supabase  from './supabase-client.js';
+import { supabase } from './supabase-client.js';
 
 // --- DOM Elements ---
 // We'll get these *after* the DOM has loaded
