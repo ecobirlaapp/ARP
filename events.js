@@ -186,7 +186,7 @@ const updateDashboardEvent = () => {
         card.classList.remove('hidden');
         document.getElementById('dashboard-event-title').textContent = upcoming.title;
         document.getElementById('dashboard-event-desc').textContent = upcoming.description || 'Join us!';
-        state.featuredEvent = upcoming; // Cache for dashboard.js if needed
+        state.featuredEvent = upcoming; 
     }
 };
 
