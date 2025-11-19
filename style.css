@@ -1,415 +1,94 @@
-/* =========================================
-   1. GLOBAL RESET & APP STRUCTURE
-   ========================================= */
-html, body {
-    height: 100%;
-    overflow: hidden; /* Prevent body scroll, handle in .main-content */
-    font-family: 'Inter', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
+/* Base & Resets */
+body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+.app-container { box-shadow: 0 0 50px rgba(0,0,0,0.08); }
 
-/* Remove default tailwind shadows to allow custom implementation control */
-:root {
-    --tw-shadow: 0 0 #0000 !important;
-    --tw-shadow-colored: 0 0 #0000 !important;
-    
-    /* Leaderboard & Brand Tokens */
-    --radius: 24px;
-    --gold: #D4AF37;
-    --silver: #C0C0C0;
-    --bronze: #CD7F32;
-    --forest-accent: #1e8f4b;
-}
-
-*, *::before, *::after {
-    box-shadow: none !important;
-}
-
-/* Re-enable shadows only for specific UI elements */
-.shadow-sm, .shadow-md, .shadow-lg, 
-.champ, .badge, .list .item, 
-.btn-eco-gradient, .glass-bottom-bar {
-    /* Shadows defined in their specific classes or via Tailwind utility if marked !important below */
-}
-
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; }
-
-.app-container {
-    max-width: 420px;
-    margin: auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow-x: hidden;
-    background-color: #f9fafb;
-}
-.dark .app-container { background-color: #030712; }
-
-header, nav {
-    flex-shrink: 0;
-}
-
-.main-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    position: relative;
-    padding-bottom: 100px; /* Space for bottom nav */
-}
-
-/* Hide scrollbar for clean UI */
-.main-content::-webkit-scrollbar { display: none; }
-.main-content { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* =========================================
-   2. ANIMATIONS & TRANSITIONS
-   ========================================= */
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-.page { 
-    display: none; 
-    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* iOS-like curve */
-}
+/* Animations */
+.page { display: none; opacity: 0; animation: fadeIn 0.3s ease-out forwards; }
 .page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes pulse-logo {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-}
-.app-loader-logo {
-    animation: pulse-logo 2s infinite ease-in-out;
-}
+/* Nav Active States */
+.sidebar-nav-item.active { background-color: #f0fdf4; color: #16a34a; font-weight: 600; }
+.dark .sidebar-nav-item.active { background-color: #064e3b; color: #4ade80; }
+.nav-item.active { color: #16a34a; }
+.dark .nav-item.active { color: #4ade80; }
 
-@keyframes pulse-points {
-    0% { transform: scale(1); color: #10B981; }
-    50% { transform: scale(1.2) rotate(-5deg); color: #34D399; }
-    100% { transform: scale(1); color: #10B981; }
-}
-.points-pulse {
-    animation: pulse-points 0.4s ease-out;
-}
+/* Cards Generic */
+.glass-card { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(229, 231, 235, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.dark .glass-card { background: rgba(17, 24, 39, 0.6); border-color: rgba(55, 65, 81, 0.6); }
+.glass-green-card { background: linear-gradient(135deg, #059669, #10b981); border-radius: 1.5rem; color: white; }
 
-/* =========================================
-   3. SIDEBAR & NAVIGATION
-   ========================================= */
-#sidebar {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    box-shadow: 5px 0 25px rgba(0,0,0,0.1) !important;
-}
-#sidebar::-webkit-scrollbar { display: none; }
-
-#sidebar-overlay { transition: opacity 0.3s ease-in-out; }
-
-/* Active States */
-.sidebar-nav-item.active {
-    background-color: #ECFDF5;
-    color: #059669;
-    font-weight: 600;
-}
-.sidebar-nav-item.active svg { color: #059669; }
-
-.dark .sidebar-nav-item.active {
-    background-color: #064E3B;
-    color: #A7F3D0;
-}
-.dark .sidebar-nav-item.active svg { color: #A7F3D0; }
-
-.nav-item.active { color: #10B981; }
-.nav-item.active svg { color: #10B981; }
-.dark .nav-item.active { color: #34D399; }
-.dark .nav-item.active svg { color: #34D399; }
-
-/* Theme Toggle */
-#theme-toggle-btn > span { transition: transform 0.3s ease-in-out; }
-
-/* =========================================
-   4. GLASSMORPHISM & CARDS
-   ========================================= */
-.glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 1.25rem;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-}
-.dark .glass-card {
-    background: rgba(30, 41, 59, 0.7); 
-    border-color: rgba(255, 255, 255, 0.05);
-    box-shadow: none !important;
-}
-
-/* Special green glass card (Dashboard Event) */
-.glass-green-card {
-    background: linear-gradient(135deg, #059669, #10B981);
+/* === RECTANGULAR EVENT CARD (NEW) === */
+.event-card-modern {
     border-radius: 1.5rem;
-    color: #ECFDF5;
-    box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4) !important;
-    position: relative;
     overflow: hidden;
+    background: white;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
+    border: 1px solid #f3f4f6;
+    position: relative;
+    transition: transform 0.2s;
 }
-.dark .glass-green-card {
-    background: linear-gradient(135deg, #065f46, #047857);
-    box-shadow: none !important;
+.dark .event-card-modern { background: #1f2937; border-color: #374151; }
+.event-card-modern:active { transform: scale(0.99); }
+
+.event-poster-rect {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
 }
 
-/* Bottom Navigation Bar */
-.glass-bottom-bar {
+.event-date-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding-bottom: env(safe-area-inset-bottom); /* iPhone X+ safety */
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.05) !important;
-}
-.dark .glass-bottom-bar {
-    background: rgba(3, 7, 18, 0.95);
-    border-top: 1px solid rgba(255,255,255,0.05);
-    box-shadow: none !important;
-}
-
-/* Gradient Buttons */
-.btn-eco-gradient {
-    background-image: linear-gradient(135deg, #10B981, #059669);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.btn-eco-gradient:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2) !important;
-}
-
-/* =========================================
-   5. LEADERBOARD ANIMATIONS (Leafs)
-   ========================================= */
-
-.leaf-layer {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0; 
-    height: 100%;
-}
-
-.leaf {
-    position: absolute;
-    top: -10vh;
-    width: 14px;
-    height: 18px;
-    border-radius: 60% 0 60% 0;
-    background: rgba(34, 197, 94, 0.4);
-    animation: leafFall linear infinite;
-}
-.dark .leaf { background: rgba(52, 211, 153, 0.2); }
-
-@keyframes leafFall {
-    0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.8; } 
-    100% { transform: translateY(100vh) translateX(40px) rotate(180deg); opacity: 0; }
-}
-
-/* Leaf timings */
-.leaf:nth-child(1) { left: 5%;  animation-duration: 13s; animation-delay: 0s; }
-.leaf:nth-child(2) { left: 18%; animation-duration: 11s; animation-delay: 2s; }
-.leaf:nth-child(3) { left: 32%; animation-duration: 15s; animation-delay: 1s; }
-.leaf:nth-child(4) { left: 46%; animation-duration: 12s; animation-delay: 3s; }
-.leaf:nth-child(5) { left: 60%; animation-duration: 16s; animation-delay: .5s; }
-.leaf:nth-child(6) { left: 72%; animation-duration: 14s; animation-delay: 4s; }
-.leaf:nth-child(7) { left: 84%; animation-duration: 13s; animation-delay: 1.5s;}
-.leaf:nth-child(8) { left: 92%; animation-duration: 17s; animation-delay: 2.5s;}
-
-/* =========================================
-   6. LEADERBOARD UI
-   ========================================= */
-.podium-wrapper {
-    position: relative;
-    margin-bottom: 40px;
-    padding-top: 20px;
+    backdrop-filter: blur(4px);
+    border-radius: 14px;
+    padding: 8px 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     z-index: 10;
 }
 
-.podium {
+.avatar-stack { display: flex; align-items: center; }
+.avatar-stack img {
+    width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; margin-left: -10px; object-fit: cover;
+}
+.dark .avatar-stack img { border-color: #1f2937; }
+.avatar-stack img:first-child { margin-left: 0; }
+
+/* === QUIZ CARD (NEW) === */
+.quiz-challenge-card {
+    background: #F3E8FF; /* Purple 50 */
+    border: 1px solid #E9D5FF;
+    border-radius: 1.5rem;
+    padding: 1.25rem;
     display: flex;
-    justify-content: center;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-.champ {
-    text-align: center;
-    padding: 15px 5px;
-    border-radius: 20px;
-    width: 32%;
-    opacity: 0;
-    animation: raise 0.8s ease forwards;
-    background: #ffffff;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    border: 1px solid rgba(0,0,0,0.03);
-}
-.dark .champ {
-    background: #1e293b;
-    box-shadow: none !important;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.champ:nth-child(1) { animation-delay: .1s; height: 150px; } 
-.champ:nth-child(2) { animation-delay: .2s; height: 180px; z-index: 2; transform: scale(1.05); border: 2px solid rgba(212, 175, 55, 0.1); } 
-.champ:nth-child(3) { animation-delay: .3s; height: 140px; } 
-
-@keyframes raise {
-    0%   { opacity: 0; transform: translateY(40px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-.badge {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    margin: -45px auto 10px auto; 
-    display: flex;
-    justify-content: center;
     align-items: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    border: 3px solid #fff;
-    background-size: cover;
-}
-.dark .badge { border-color: #1e293b; }
-
-.gold   { background: var(--gold); }
-.silver { background: var(--silver); }
-.bronze { background: var(--bronze); }
-
-.champ-name   { font-weight: 700; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
-.champ-points { font-size: 11px; font-weight: 600; color: #10B981; }
-
-/* List Items */
-.list { display: flex; flex-direction: column; gap: 10px; }
-
-.item {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-radius: 16px;
-    background: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.dark .quiz-challenge-card { background: #3b0764; border-color: #581c87; }
+.quiz-challenge-card:active { background: #e9d5ff; }
+
+/* === PRODUCT DETAIL (NEW) === */
+.product-highlights li { margin-bottom: 0.75rem; display: flex; align-items: center; font-size: 0.875rem; color: #4b5563; }
+.dark .product-highlights li { color: #d1d5db; }
+
+.spec-box { 
+    background: #F9FAFB; border-radius: 12px; padding: 12px 16px; flex: 1; 
     border: 1px solid #f3f4f6;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
 }
-.dark .item {
-    background: #1e293b;
-    border-color: #334155;
-    box-shadow: none !important;
-}
-.item.is-me {
-    background: #ecfdf5;
-    border: 1px solid #10b981;
-}
-.dark .item.is-me {
-    background: rgba(16, 185, 129, 0.1);
-    border-color: #059669;
-}
+.dark .spec-box { background: #111827; border-color: #374151; }
 
-/* =========================================
-   7. MODALS (Sheet Style)
-   ========================================= */
-#checkin-modal, #chatbot-modal, #eco-quiz-modal, #purchase-modal, #qr-modal {
-    transition: opacity 0.3s ease, visibility 0.3s;
-    z-index: 50;
+.sticky-footer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #f3f4f6; padding: 16px 24px; z-index: 50;
+    max-width: 420px; margin: 0 auto;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
+.dark .sticky-footer { background: #020617; border-color: #1e293b; }
 
-#checkin-modal-content, #chatbot-modal-content, #eco-quiz-modal-content {
-    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); /* Smooth slide up */
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.15) !important;
-}
-.dark #checkin-modal-content, .dark #chatbot-modal-content, .dark #eco-quiz-modal-content {
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5) !important;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-#checkin-modal.open, #chatbot-modal.open, #eco-quiz-modal.open {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Check-in Completed State Logic */
-.checkin-completed {
-    background: #F3F4F6 !important;
-    background-image: none !important;
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05) !important;
-    border: 1px solid #E5E7EB !important;
-    color: #9CA3AF !important;
-    cursor: default !important;
-    transform: none !important;
-}
-.dark .checkin-completed {
-    background: #1F2937 !important;
-    border-color: #374151 !important;
-    color: #6B7280 !important;
-}
-.checkin-completed .checkin-hide-on-complete { display: none !important; }
-.checkin-completed h3, .checkin-completed span, .checkin-completed i { color: #9CA3AF !important; }
-.dark .checkin-completed h3, .dark .checkin-completed span, .dark .checkin-completed i { color: #6B7280 !important; }
-
-/* =========================================
-   8. UTILITIES & FORM INPUTS
-   ========================================= */
-.custom-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1.2em;
-    padding-right: 2.5rem;
-}
-
-.leaderboard-tab-btn { 
-    border-radius: 9999px; 
-    transition: all 0.2s ease;
-}
-.leaderboard-tab-btn.active {
-    background-color: #ffffff;
-    color: #10B981;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-}
-.dark .leaderboard-tab-btn.active {
-    background-color: #1f2937;
-    color: #34D399;
-    box-shadow: none !important;
-}
-
-/* App Loader Fade */
-#app-loading { transition: opacity 0.5s ease, visibility 0.5s; }
-#app-loading.loaded { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Camera Overlay */
-#camera-feed {
-    object-fit: cover;
-    background: #000;
-}
-
-/* Quiz Options Hover */
-#eco-quiz-modal-options button:active {
-    background-color: #f3f4f6;
-    transform: scale(0.98);
-}
-.dark #eco-quiz-modal-options button:active {
-    background-color: #374151;
-}
+/* Utils */
+.hidden { display: none !important; }
