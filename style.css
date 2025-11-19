@@ -639,3 +639,24 @@ header, nav {
     overflow-y: auto;
     height: 100%;
 }
+/* Hide Scrollbar for Product Slider */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Product Detail Specifics */
+#product-detail-page {
+    /* Ensure sticky bottom bar sits correctly */
+    z-index: 20; 
+}
+
+/* Smooth transitions for the sticky bar if needed */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
