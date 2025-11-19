@@ -237,13 +237,83 @@ export const loadUserRewardsData = async () => {
     } catch (err) { console.error('User Rewards Load Error:', err); }
 };
 
+// ENHANCED RENDER REWARDS PAGE
 export const renderMyRewardsPage = () => {
     els.allRewardsList.innerHTML = '';
-    if (state.userRewards.length === 0) { els.allRewardsList.innerHTML = `<p class="text-sm text-center text-gray-500">You haven't purchased any rewards yet.</p>`; return; }
+    
+    if (state.userRewards.length === 0) { 
+        els.allRewardsList.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 opacity-60">
+                <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                    <i data-lucide="shopping-bag" class="w-8 h-8 text-gray-400"></i>
+                </div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No orders yet.</p>
+                <button onclick="showPage('rewards')" class="mt-4 text-brand-600 font-bold text-sm hover:underline">Visit Store</button>
+            </div>`; 
+        if(window.lucide) window.lucide.createIcons();
+        return; 
+    }
+
     state.userRewards.forEach(ur => {
+        // Status Logic
+        let statusBadge = '';
+        let actionButton = '';
+        const isConfirmed = ur.status === 'confirmed';
+        
+        if (isConfirmed) {
+            statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 uppercase tracking-wide">Ready</span>`;
+            
+            // Enhanced QR Button
+            actionButton = `
+                <button onclick="openRewardQrModal('${ur.userRewardId}')" class="flex items-center justify-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2.5 rounded-xl shadow-lg shadow-gray-200 dark:shadow-none active:scale-95 transition-all w-full mt-3 group">
+                    <i data-lucide="qr-code" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs font-bold">Show QR Code</span>
+                </button>
+            `;
+        } else {
+            const color = ur.status === 'pending' ? 'yellow' : 'red';
+            statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-${color}-100 text-${color}-700 dark:bg-${color}-900/40 dark:text-${color}-400 uppercase tracking-wide">${ur.status}</span>`;
+            actionButton = `
+                <button disabled class="flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 px-4 py-2.5 rounded-xl w-full mt-3 cursor-not-allowed">
+                    <span class="text-xs font-bold">Processing...</span>
+                </button>
+            `;
+        }
+
+        // Render Ticket Card
         els.allRewardsList.innerHTML += `
-            <div class="glass-card p-4 rounded-2xl flex items-center justify-between"><div class="flex items-center"><img src="${ur.productImage}" class="w-14 h-14 rounded-lg object-cover mr-3"><div class="p-1"><p class="text-sm font-bold text-gray-900 dark:text-gray-100">${ur.productName}</p><p class="text-xs text-gray-500 dark:text-gray-400">From ${ur.storeName}</p><p class="text-xs text-gray-400 mt-1">${ur.purchaseDate}</p></div></div>${ur.status === 'confirmed' ? `<button onclick="openRewardQrModal('${ur.userRewardId}')" class="text-xs font-semibold px-3 py-2 rounded-full bg-emerald-600 text-white">View QR</button>` : `<span class="text-xs font-semibold px-3 py-2 rounded-full bg-gray-200 text-gray-600">${ur.status}</span>`}</div>`;
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/20 dark:to-gray-700/0 rounded-full z-0"></div>
+                
+                <div class="relative z-10 flex gap-4">
+                    <div class="flex-shrink-0">
+                        <img src="${ur.productImage}" class="w-20 h-20 rounded-2xl object-cover border border-gray-100 dark:border-gray-700 shadow-sm" onerror="this.src='${getPlaceholderImage()}'">
+                    </div>
+                    
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate pr-2">${ur.storeName}</p>
+                            ${statusBadge}
+                        </div>
+                        <h3 class="text-sm font-black text-gray-900 dark:text-white leading-tight mb-1 line-clamp-2">${ur.productName}</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${ur.purchaseDate}</p>
+                    </div>
+                </div>
+
+                <div class="relative mt-4 mb-1">
+                    <div class="absolute left-0 right-0 top-1/2 border-t border-dashed border-gray-300 dark:border-gray-600"></div>
+                    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-50 dark:bg-gray-900 rounded-full"></div>
+                    <div class="absolute -right-6 top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-50 dark:bg-gray-900 rounded-full"></div>
+                </div>
+
+                <div class="pt-1 relative z-10">
+                    ${actionButton}
+                </div>
+            </div>
+        `;
     });
+    
+    if(window.lucide) window.lucide.createIcons();
 };
 
 export const openRewardQrModal = (userRewardId) => {
