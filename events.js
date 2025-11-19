@@ -4,14 +4,15 @@ import { els, formatDate, getPlaceholderImage, getTickImg } from './utils.js';
 
 export const loadEventsData = async () => {
     try {
-        // Fetch events + attendance counts + specific attendee details (for avatars)
+        // Fetch events with attendees
+        // We use the specific foreign key name to avoid ambiguous relationship errors
         const { data: events, error } = await supabase
             .from('events')
             .select(`
                 *,
                 event_attendance (
                     status,
-                    users ( id, full_name, profile_img_url, tick_type )
+                    users!event_attendance_user_id_fkey ( id, full_name, profile_img_url, tick_type )
                 )
             `)
             .order('start_at', { ascending: true });
@@ -19,14 +20,17 @@ export const loadEventsData = async () => {
         if (error) throw error;
 
         state.events = events.map(e => {
-            // Filter for confirmed/registered attendees
-            const attendees = e.event_attendance
-                .filter(a => a.status === 'registered' || a.status === 'confirmed')
-                .map(a => a.users);
+            const rawAttendees = e.event_attendance || [];
             
-            // Check if current user is going
-            const myAttendance = e.event_attendance.find(a => a.users && a.users.id === state.currentUser.id);
-            let myStatus = 'upcoming'; // default
+            // Map attendees safely
+            const attendees = rawAttendees
+                .filter(a => a.status === 'registered' || a.status === 'confirmed')
+                .map(a => a.users)
+                .filter(u => u !== null); // Filter out any nulls
+            
+            // Check my status
+            const myAttendance = rawAttendees.find(a => a.users && a.users.id === state.currentUser.id);
+            let myStatus = 'upcoming'; 
             if (myAttendance) {
                 if (myAttendance.status === 'confirmed') myStatus = 'attended';
                 else if (myAttendance.status === 'absent') myStatus = 'missed';
@@ -45,8 +49,6 @@ export const loadEventsData = async () => {
         });
 
         if (document.getElementById('events').classList.contains('active')) renderEventsPage();
-        
-        // Update dashboard featured event logic
         updateDashboardEvent();
 
     } catch (err) { console.error('Events Load Error:', err); }
@@ -60,7 +62,7 @@ export const renderEventsPage = () => {
     }
 
     state.events.forEach(e => {
-        // Avatar Stack HTML
+        // Avatar Stack
         let avatarsHtml = '';
         const showMax = 3;
         const extraCount = e.attendeeCount - showMax;
@@ -72,12 +74,11 @@ export const renderEventsPage = () => {
         if (extraCount > 0) {
             avatarsHtml += `<div class="more-count">+${extraCount}</div>`;
         }
-        // If nobody is going yet
         if (e.attendeeCount === 0) {
             avatarsHtml = `<span class="text-xs text-gray-400 italic pl-1">Be the first!</span>`;
         }
 
-        // Action Button Logic
+        // Action Button
         let actionBtn = '';
         if (e.myStatus === 'going') {
             actionBtn = `<button disabled class="w-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 font-bold py-3 rounded-xl text-sm">✓ Registered</button>`;
@@ -136,8 +137,6 @@ export const handleRSVP = async (eventId) => {
             status: 'registered'
         });
         if (error) throw error;
-
-        // Reload to update UI
         await loadEventsData();
         alert("You have successfully registered!");
     } catch (err) {
@@ -148,16 +147,21 @@ export const handleRSVP = async (eventId) => {
     }
 };
 
-// Modal Logic for Participants
+// FIX: Improved Modal Visibility Logic
 export const openParticipantsModal = (eventId) => {
     const eventData = state.events.find(e => e.id === eventId);
-    if (!eventData || !eventData.attendees.length) return;
+    // Allow opening even if empty list so user sees it's empty (or we can handle logic differently)
+    // But checking length > 0 is fine.
+    if (!eventData || !eventData.attendees || eventData.attendees.length === 0) {
+        return; 
+    }
 
     const modal = document.getElementById('participants-modal');
+    const content = document.getElementById('participants-modal-content');
     const list = document.getElementById('participants-list');
     
     list.innerHTML = eventData.attendees.map(u => `
-        <div class="flex items-center p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800">
+        <div class="flex items-center p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 last:border-0">
             <img src="${u.profile_img_url || getPlaceholderImage('40x40', u.full_name[0])}" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700 mr-3">
             <div>
                 <p class="text-sm font-bold text-gray-900 dark:text-white flex items-center">${u.full_name} ${getTickImg(u.tick_type)}</p>
@@ -166,18 +170,34 @@ export const openParticipantsModal = (eventId) => {
         </div>
     `).join('');
 
+    // 1. Show the overlay
     modal.classList.remove('invisible', 'opacity-0');
+    
+    // 2. Animate the content up
+    // We remove the 'translate-y-full' (hidden down) and add 'translate-y-0' (shown)
+    setTimeout(() => {
+        content.classList.remove('translate-y-full');
+        content.classList.add('translate-y-0');
+    }, 10);
 };
 
 export const closeParticipantsModal = () => {
-    document.getElementById('participants-modal').classList.add('invisible', 'opacity-0');
+    const modal = document.getElementById('participants-modal');
+    const content = document.getElementById('participants-modal-content');
+
+    // 1. Animate content down
+    content.classList.remove('translate-y-0');
+    content.classList.add('translate-y-full');
+
+    // 2. Hide overlay after animation finishes
+    setTimeout(() => {
+        modal.classList.add('invisible', 'opacity-0');
+    }, 300);
 };
 
-// Dashboard Helper
 const updateDashboardEvent = () => {
     const card = document.getElementById('dashboard-event-card');
-    
-    // Find the next upcoming event that isn't passed
+    if (!card) return;
     const upcoming = state.events.filter(e => new Date(e.start_at) > new Date())[0];
 
     if (!upcoming) {
@@ -190,7 +210,6 @@ const updateDashboardEvent = () => {
     }
 };
 
-// Window exports
 window.handleRSVP = handleRSVP;
 window.openParticipantsModal = openParticipantsModal;
 window.closeParticipantsModal = closeParticipantsModal;
