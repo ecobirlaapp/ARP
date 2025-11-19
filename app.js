@@ -5,83 +5,69 @@ import * as Store from './store.js';
 import * as Social from './social.js';
 import * as Challenges from './challenges.js';
 
-// 1. Auth & Init
 const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return window.location.replace('login.html');
-    
-    state.userAuth = session.user;
-    
-    // Fetch Profile
-    const { data: profile } = await supabase.from('users').select('*').eq('auth_user_id', state.userAuth.id).single();
-    state.currentUser = profile;
-    
-    await loadAllData();
-    
-    // Remove Loader
-    document.getElementById('app-loading').classList.add('loaded');
-    if(window.lucide) window.lucide.createIcons();
-    
-    // Init Listeners
-    Social.setupProfileUpload(loadAllData);
-};
+    if (!session) return window.location.href = 'login.html'; 
 
-const loadAllData = async () => {
+    const { data: user } = await supabase.from('users').select('*').eq('auth_user_id', session.user.id).single();
+    state.currentUser = user;
+    
     await Promise.all([
         Dashboard.loadDashboardData(),
-        Store.loadStoreAndProductData(),
-        Store.loadUserRewardsData(),
-        Social.loadLeaderboardData(),
-        Challenges.loadChallengesData()
+        Store.loadStoreData(),
+        Social.loadSocialData(),
+        Challenges.loadChallengesAndEvents()
     ]);
     
-    // Refresh current view
-    const activePage = document.querySelector('.page.active').id;
-    if (activePage === 'dashboard') Dashboard.renderDashboard();
-    if (activePage === 'profile') Social.renderProfile();
-    if (activePage === 'leaderboard') Social.renderStudentLeaderboard();
+    document.getElementById('app-loading').classList.add('opacity-0', 'pointer-events-none');
+    setTimeout(() => document.getElementById('app-loading').remove(), 500);
+
+    // Default sidebar user info
+    const sbAvatar = document.getElementById('user-avatar-sidebar');
+    const sbName = document.getElementById('user-name-sidebar');
+    const sbPoints = document.getElementById('user-points-sidebar');
+    if(sbAvatar) sbAvatar.src = user.profile_img_url || 'https://placehold.co/80x80';
+    if(sbName) sbName.textContent = user.full_name;
+    if(sbPoints) sbPoints.textContent = user.current_points;
+
+    Dashboard.renderDashboard();
+    if(window.lucide) window.lucide.createIcons();
 };
 
-// 2. Global Navigation (Attached to Window for HTML onclick)
 window.showPage = (pageId) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
-    
-    // Render on Demand
-    if (pageId === 'dashboard') Dashboard.renderDashboard();
-    if (pageId === 'rewards') Store.renderRewards();
-    if (pageId === 'my-rewards') Store.renderMyRewardsPage();
-    if (pageId === 'leaderboard') Social.renderStudentLeaderboard();
-    if (pageId === 'profile') Social.renderProfile();
-    if (pageId === 'challenges') Challenges.renderChallengesPage();
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+    document.getElementById('sidebar-overlay').classList.add('opacity-0', 'hidden');
+
+    if(pageId === 'dashboard') Dashboard.renderDashboard();
+    if(pageId === 'rewards') Store.renderRewardsPage();
+    if(pageId === 'my-rewards') Store.renderRewardsPage(); 
+    if(pageId === 'leaderboard') Social.renderLeaderboard();
+    if(pageId === 'history') Social.renderHistory();
+    if(pageId === 'challenges') Challenges.renderChallengesPage();
+    if(pageId === 'events') Challenges.renderEventsPage();
     
     if(window.lucide) window.lucide.createIcons();
-    document.getElementById('sidebar').classList.add('-translate-x-full'); // Close sidebar
 };
 
 window.toggleSidebar = () => {
-    document.getElementById('sidebar').classList.toggle('-translate-x-full');
-    document.getElementById('sidebar-overlay').classList.toggle('hidden');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    const isOpen = !sb.classList.contains('-translate-x-full');
+    if(isOpen) {
+        sb.classList.add('-translate-x-full');
+        ov.classList.add('opacity-0', 'hidden');
+    } else {
+        sb.classList.remove('-translate-x-full');
+        ov.classList.remove('hidden');
+        setTimeout(() => ov.classList.remove('opacity-0'), 10);
+    }
 };
 
 window.handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.replace('login.html');
+    window.location.reload();
 };
 
-// 3. Attach Feature Functions to Window
-window.openCheckinModal = Dashboard.openCheckinModal;
-window.handleDailyCheckin = () => Dashboard.handleDailyCheckin(loadAllData);
-window.showProductDetailPage = Store.showProductDetailPage;
-window.openPurchaseModal = (id) => {
-    Store.showProductDetailPage(id); // Or specialized modal
-    document.getElementById('purchase-modal-overlay').classList.remove('hidden');
-    // (Simplified logic for modal trigger)
-};
-window.confirmPurchase = (id) => Store.confirmPurchase(id, loadAllData);
-window.startCamera = Challenges.startCamera;
-window.capturePhoto = () => Challenges.capturePhoto(loadAllData);
-window.closeCameraModal = () => document.getElementById('camera-modal').classList.add('hidden');
-
-// Start App
 checkAuth();
