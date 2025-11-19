@@ -23,17 +23,76 @@ export const loadChallengesData = async () => {
             return { ...c, icon: getIconForChallenge(c.type), status, buttonText, isDisabled };
         });
 
+        // Initialize Quiz Status Check
+        checkQuizStatus();
+
         if (document.getElementById('challenges').classList.contains('active')) renderChallengesPage();
     } catch (err) { console.error('Challenges Load Error:', err); }
 };
 
-// 2. Render Challenges Page
+// 2. Check Quiz Status Logic (NEW)
+const checkQuizStatus = async () => {
+    const quizSection = document.getElementById('daily-quiz-section');
+    const btn = document.getElementById('btn-quiz-play');
+    if (!quizSection || !btn) return;
+
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // 1. Get Today's Quiz ID
+        const { data: quiz, error: quizError } = await supabase
+            .from('daily_quizzes')
+            .select('id')
+            .eq('available_date', today)
+            .limit(1)
+            .single();
+
+        if (quizError || !quiz) {
+            // No quiz today, maybe hide the section
+            quizSection.classList.add('hidden');
+            return;
+        }
+
+        // 2. Check if user submitted this quiz
+        const { data: submission, error: subError } = await supabase
+            .from('quiz_submissions')
+            .select('id')
+            .eq('quiz_id', quiz.id)
+            .eq('user_id', state.currentUser.id)
+            .maybeSingle(); // Use maybeSingle to avoid error on 0 rows
+
+        // 3. Update UI
+        quizSection.classList.remove('hidden'); // Show section if quiz exists
+        
+        if (submission) {
+            // User has played
+            btn.textContent = "Attempted";
+            btn.disabled = true;
+            btn.onclick = null; // Remove click handler
+            // Styling for disabled state
+            btn.classList.remove('bg-brand-600', 'hover:bg-brand-500', 'shadow-md');
+            btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400', 'cursor-default');
+        } else {
+            // User has NOT played
+            btn.textContent = "Play Now";
+            btn.disabled = false;
+            btn.onclick = openEcoQuizModal;
+            // Restore active styling
+            btn.classList.add('bg-brand-600', 'hover:bg-brand-500', 'shadow-md');
+            btn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400', 'cursor-default');
+        }
+
+    } catch (err) {
+        console.error("Quiz Status Check Failed:", err);
+    }
+};
+
+// 3. Render Challenges Page
 export const renderChallengesPage = () => {
     els.challengesList.innerHTML = '';
 
-    // Show Quiz Section if Quiz is active/available
-    const quizSection = document.getElementById('daily-quiz-section');
-    if (quizSection) quizSection.classList.remove('hidden');
+    // Ensure quiz check runs whenever we render this page
+    checkQuizStatus();
 
     if (state.dailyChallenges.length === 0) { els.challengesList.innerHTML = `<p class="text-sm text-center text-gray-500">No active photo challenges.</p>`; return; }
     
@@ -52,7 +111,7 @@ export const renderChallengesPage = () => {
     if(window.lucide) window.lucide.createIcons();
 };
 
-// 3. Camera Logic with FLIP
+// 4. Camera Logic with FLIP
 let currentCameraStream = null;
 let currentChallengeIdForCamera = null;
 let currentFacingMode = 'environment'; // default to back camera
@@ -132,7 +191,7 @@ export const capturePhoto = async () => {
     }, 'image/jpeg', 0.8);
 };
 
-// 4. Quiz Logic
+// 5. Quiz Logic
 let currentQuizId = null;
 
 export const openEcoQuizModal = async () => {
@@ -165,18 +224,20 @@ export const openEcoQuizModal = async () => {
 
         currentQuizId = quiz.id;
 
-        // Check if already played
+        // Check if already played (Redundant check, but safe for modal opening)
         const { data: submission } = await supabase
             .from('quiz_submissions')
             .select('*')
             .eq('quiz_id', quiz.id)
             .eq('user_id', state.currentUser.id)
-            .single();
+            .maybeSingle();
 
         loading.classList.add('hidden');
 
         if (submission) {
             played.classList.remove('hidden');
+            // Also update the main button just in case
+            checkQuizStatus();
         } else {
             body.classList.remove('hidden');
             document.getElementById('eco-quiz-question').textContent = quiz.question;
@@ -238,6 +299,7 @@ const submitQuizAnswer = async (selectedIndex, correctIndex, points) => {
 
     setTimeout(() => {
         closeEcoQuizModal();
+        checkQuizStatus(); // Update button state immediately
         // Refresh User Points
         import('./app.js').then(m => m.refreshUserData());
     }, 2000);
