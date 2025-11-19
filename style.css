@@ -660,3 +660,41 @@ header, nav {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
 }
+
+/* =========================================
+   8. NAVIGATION & REWARDS UPDATES
+   ========================================= */
+
+/* Nav Item Tweaks for 5 columns */
+.nav-item span {
+    font-size: 10px; /* Adjusted for 5 items */
+    letter-spacing: 0.2px;
+    font-weight: 700;
+}
+
+/* Active Nav Item Styling Override */
+.nav-item.active {
+    color: #10B981 !important; /* Green-500 */
+}
+.nav-item.active svg {
+    stroke-width: 2.5px;
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+
+/* Dark Mode Nav Active */
+.dark .nav-item.active {
+    color: #34D399 !important; /* Green-400 */
+}
+
+/* Rewards Card Hover Effect */
+.glass-card, .bg-white.rounded-3xl {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+/* Only hover effect on desktop/non-touch */
+@media (hover: hover) {
+    .bg-white.rounded-3xl:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
+    }
+}
