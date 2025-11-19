@@ -625,3 +625,17 @@ header, nav {
     margin-left: 4px;
     margin-top: -2px;
 }
+/* Dept Detail Fixes */
+#department-detail-page {
+    padding: 0 !important; /* Let the internal divs handle padding for sticky header */
+    background-color: #f9fafb;
+}
+.dark #department-detail-page {
+    background-color: #111827;
+}
+
+/* Ensure sticky header works */
+.main-content {
+    overflow-y: auto;
+    height: 100%;
+}
