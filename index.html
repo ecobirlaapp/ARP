@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoCampus - Green Initiative</title>
     
-    <!-- Supabase Client CDN -->
-    <script src="[https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2)"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css"> 
     
-    <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
@@ -30,14 +29,12 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
 
-    <!-- File Inputs for Cloudinary Uploads -->
     <input type="file" id="profile-upload-input" accept="image/*" class="hidden">
     <input type="file" id="challenge-file-input" accept="image/*" class="hidden">
 
-    <!-- App Loader -->
     <div id="app-loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-900">
         <div class="app-loader-logo">
-            <img src="[https://i.ibb.co/GLJzFsX/Untitled-1.png](https://i.ibb.co/GLJzFsX/Untitled-1.png)"
+            <img src="https://i.ibb.co/GLJzFsX/Untitled-1.png"
                  class="w-40 h-40 object-contain"
                  alt="EcoCampus Logo">
         </div>
@@ -46,13 +43,11 @@
         </p>
     </div>
 
-    <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 opacity-0 hidden"></div>
     
-    <!-- Sidebar -->
     <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white dark:bg-gray-800 z-40 transform -translate-x-full flex flex-col">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <img id="user-avatar-sidebar" src="[https://placehold.co/80x80/A3E635/FFFFFF?text=](https://placehold.co/80x80/A3E635/FFFFFF?text=)..." class="w-16 h-16 rounded-full mb-3 border-2 border-green-500 object-cover" alt="User Avatar">
+            <img id="user-avatar-sidebar" src="https://placehold.co/80x80/A3E635/FFFFFF?text=..." class="w-16 h-16 rounded-full mb-3 border-2 border-green-500 object-cover" alt="User Avatar">
             <h2 id="user-name-sidebar" class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-1">
                 Loading...
             </h2>
@@ -115,14 +110,12 @@
         </div>
 
         <div class="p-6 border-t border-gray-200 dark:border-gray-700">
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v9.0</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v8.0</p>
         </div>
     </div>
 
-    <!-- Main App Container -->
     <div class="app-container bg-white dark:bg-gray-950">
 
-        <!-- Header -->
         <header class="bg-white dark:bg-gray-950 sticky top-0 z-10 p-4 border-b border-gray-200 dark:border-gray-800">
             <div class="flex justify-between items-center">
                 <div class="w-1/3">
@@ -144,10 +137,8 @@
             </div>
         </header>
 
-        <!-- Main Content Area (Scrollable) -->
         <main class="main-content bg-gray-50 dark:bg-gray-900">
 
-            <!-- Dashboard Page -->
             <div id="dashboard" class="page active p-6">
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -158,22 +149,20 @@
                     </p>
                 </div>
 
-                <!-- Upcoming Event Card (Hidden if no event) -->
                 <div id="dashboard-event-card" class="glass-green-card p-5 mb-6 hidden">
                     <div class="flex items-center mb-2">
                         <i data-lucide="calendar-check" class="w-5 h-5 mr-2 text-emerald-100"></i>
                         <h3 class="font-bold tracking-tight text-emerald-50">Upcoming Event</h3>
                     </div>
                     <p id="dashboard-event-title" class="text-lg font-semibold mb-1 text-emerald-50">Loading...</p>
-                    <p id="dashboard-event-desc" class="text-sm opacity-95 mb-4 text-emerald-100 line-clamp-2">
+                    <p id="dashboard-event-desc" class="text-sm opacity-95 mb-4 text-emerald-100">
                         Loading event details...
                     </p>
                     <button onclick="showPage('events')" class="px-4 py-2 rounded-full text-xs font-semibold bg-emerald-50/15 text-emerald-50 border border-emerald-100/40">
-                        View Details
+                        View All Events
                     </button>
                 </div>
 
-                <!-- Daily Check-in Button -->
                 <button id="daily-checkin-button" onclick="openCheckinModal()" class="w-full bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-yellow-500 dark:to-orange-500 p-5 rounded-2xl mb-6 flex items-center justify-between relative overflow-hidden transition-all duration-300 shadow-lg">
                    <div class="checkin-hide-on-complete">
                         <h3 class="text-lg font-bold text-white dark:text-gray-900">Daily Check-in</h3>
@@ -232,16 +221,14 @@
                 </div>
             </div>
 
-            <!-- Profile Page -->
             <div id="profile" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Your Profile</h2>
                 <div class="space-y-6">
                     <div class="glass-card rounded-2xl overflow-hidden">
                         <div class="bg-green-500 h-24"></div>
                         <div class="p-5 -mt-16 flex flex-col items-center">
-                            <!-- Make Profile Picture Clickable for Upload -->
                             <div class="relative group cursor-pointer" onclick="document.getElementById('profile-upload-input').click()">
-                                <img id="profile-avatar" src="[https://placehold.co/112x112/A3E635/FFFFFF?text=](https://placehold.co/112x112/A3E635/FFFFFF?text=)..." class="w-28 h-28 rounded-full border-4 border-white dark:border-gray-800 object-cover">
+                                <img id="profile-avatar" src="https://placehold.co/112x112/A3E635/FFFFFF?text=..." class="w-28 h-28 rounded-full border-4 border-white dark:border-gray-800 object-cover">
                                 <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <i data-lucide="camera" class="w-8 h-8 text-white"></i>
                                 </div>
@@ -249,7 +236,7 @@
                             
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-3 flex items-center justify-center gap-1">
                                 <span id="profile-name">Loading...</span>
-                            </h3>
+                                </h3>
                             <p id="profile-email" class="text-gray-500 dark:text-gray-400">...</p>
                             <p id="profile-joined" class="text-sm text-gray-400 dark:text-gray-500 mt-1">...</p>
 
@@ -290,7 +277,6 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Page -->
             <div id="leaderboard" class="page p-6 relative">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">Eco Hall of Champions</h2>
 
@@ -332,29 +318,13 @@
                 </div>
             </div>
 
-            <!-- Challenges Page -->
             <div id="challenges" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Daily Challenges</h2>
-                
-                <!-- Quiz Section Card -->
-                <div id="daily-quiz-card" class="glass-card p-4 rounded-2xl mb-6 border-l-4 border-purple-500">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Brainy Eco-Quiz</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Test your knowledge!</p>
-                        </div>
-                        <button onclick="openQuizModal()" class="bg-purple-600 text-white text-sm font-bold py-2 px-4 rounded-full hover:bg-purple-700 transition-colors">
-                            Start Quiz
-                        </button>
-                    </div>
-                </div>
-
                 <div id="challenges-page-list" class="space-y-4">
                     <p class="text-center text-gray-500 dark:text-gray-400">Loading challenges...</p>
                 </div>
             </div>
 
-            <!-- EcoPoints Page -->
             <div id="ecopoints" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">My EcoPoints</h2>
 
@@ -377,6 +347,13 @@
                         <p id="ecopoints-level-next" class="text-xs text-right text-gray-500 dark:text-gray-400 mt-1">...</p>
                     </div>
                 </div>
+
+                <div class="glass-card p-6 rounded-2xl mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">All Levels</h3>
+                    <div id="all-levels-list" class="space-y-4">
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Loading levels...</p>
+                    </div>
+                </div>
                 
                 <div class="glass-card p-6 rounded-2xl mb-6">
                      <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Recent Transactions</h4>
@@ -386,15 +363,13 @@
                 </div>
             </div>
 
-            <!-- Events Page -->
             <div id="events" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">All Events</h2>
-                <div id="event-list" class="space-y-6">
+                <div id="event-list" class="space-y-4">
                     <p class="text-center text-gray-500 dark:text-gray-400">Loading events...</p>
                 </div>
             </div>
 
-            <!-- Rewards (Store) Page -->
             <div id="rewards" class="page p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Eco-Store</h2>
@@ -403,18 +378,38 @@
                     </span>
                 </div>
 
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Redeem your EcoPoints for canteen coupons, coffee and exclusive college merch.
+                </p>
+
                 <div class="space-y-4 mb-5">
                     <div>
+                        <label for="store-search-input" class="block text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 px-1">
+                            Search store or reward
+                        </label>
                         <div class="relative">
-                            <input id="store-search-input" type="text" placeholder="Search rewards..." class="w-full border border-gray-300 dark:border-gray-700 px-4 py-3 rounded-full bg-white/80 dark:bg-gray-900/80 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <button id="store-search-clear" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 hidden"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            <input id="store-search-input"
+                                   type="text"
+                                   placeholder="Try “Hoodie” or “Canteen coupon”"
+                                   class="w-full border border-gray-300 dark:border-gray-700 px-4 py-3 rounded-full bg-white/80 dark:bg-gray-900/80 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button id="store-search-clear"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 hidden">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
                         </div>
                     </div>
+
                     <div>
-                        <select id="sort-by-select" class="custom-select w-full border border-gray-300 dark:border-gray-700 px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/80 dark:bg-gray-900/90 dark:text-white">
+                        <label for="sort-by-select" class="block text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 px-1">
+                            Sort by
+                        </label>
+                        <select id="sort-by-select"
+                                class="custom-select w-full border border-gray-300 dark:border-gray-700 px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 bg-white/80 dark:bg-gray-900/90 dark:text-white">
                             <option value="popularity">Popularity</option>
                             <option value="points-lh">Points: Low to High</option>
                             <option value="points-hl">Points: High to Low</option>
+                            <option value="price-lh">Price: Low to High</option>
+                            <option value="price-hl">Price: High to Low</option>
                         </select>
                     </div>
                 </div>
@@ -424,146 +419,229 @@
                 </div>
             </div>
             
-            <!-- Redeem Code Page -->
             <div id="redeem-code" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Redeem Code</h2>
+                
                 <div class="glass-card p-6 rounded-2xl mb-6">
                     <div class="flex justify-center mb-6">
                         <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
                             <i data-lucide="ticket" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i>
                         </div>
                     </div>
+                    
+                    <p class="text-center text-gray-600 dark:text-gray-300 mb-6">
+                        Got a special code from an event or challenge? Enter it below to claim your bonus EcoPoints!
+                    </p>
+
                     <form id="redeem-code-form" class="space-y-6">
                         <div>
                             <label for="redeem-input" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">10-Digit Code</label>
                             <input id="redeem-input" name="redeem-input" type="text" maxlength="10" required
-                                   class="w-full border-2 border-gray-300 dark:border-gray-600 px-4 py-3 rounded-xl text-center text-2xl tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 dark:text-white" placeholder="XXXXXXXXXX">
+                                   class="w-full border-2 border-gray-300 dark:border-gray-600 px-4 py-3 rounded-xl text-center text-2xl tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white placeholder-gray-300 dark:placeholder-gray-500"
+                                   placeholder="XXXXXXXXXX">
                         </div>
+
                         <div id="redeem-message" class="text-sm text-center h-5"></div>
-                        <button type="submit" id="redeem-submit-btn" class="w-full btn-eco-gradient text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:opacity-90">Redeem Points</button>
+
+                        <button type="submit" id="redeem-submit-btn"
+                                class="w-full btn-eco-gradient text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:opacity-90 transform transition-transform active:scale-95">
+                            Redeem Points
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Pages -->
             <div id="store-detail-page" class="page dark:bg-gray-900"></div>
             <div id="product-detail-page" class="page dark:bg-gray-900"></div>
-            <div id="department-detail-page" class="page dark:bg-gray-900 p-6"></div>
+            <div id="department-detail-page" class="page dark:bg-gray-900 p-6">
+                 </div>
+
             <div id="my-rewards" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">My Orders</h2>
-                <div id="all-rewards-list" class="space-y-4"></div>
+                <div id="all-rewards-list" class="space-y-4">
+                    <p class="text-center text-gray-500 dark:text-gray-400">Loading your orders...</p>
+                </div>
             </div>
+
             <div id="history" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Activity History</h2>
-                <div id="history-list" class="space-y-3"></div>
+                <div id="history-list" class="space-y-3">
+                    <p class="text-center text-gray-500 dark:text-gray-400">Loading history...</p>
+                </div>
             </div>
+
             <div id="about" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">About Us</h2>
-                <div class="glass-card p-6 rounded-2xl space-y-4"><p class="text-gray-600 dark:text-gray-300">Welcome to EcoCampus.</p></div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        Welcome to the Green Campus Challenge, an initiative by the College Green Club to promote sustainability and eco-friendly practices among students.
+                    </p>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        Our mission is to reduce our campus's carbon footprint through fun challenges, engaging events, and rewarding positive actions. Join us in making our campus a greener place, one EcoPoint at a time!
+                    </p>
+                </div>
             </div>
+
             <div id="help" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Help & Support</h2>
-                <div class="glass-card p-6 rounded-2xl space-y-4"><p class="text-gray-600 dark:text-gray-300">Contact support@ecocampus.edu.</p></div>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Frequently Asked Questions</h3>
+                    <div class="text-left space-y-4 text-sm">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">How do I earn points?</p>
+                            <p class="text-gray-600 dark:text-gray-300">You can earn EcoPoints by participating in events, completing challenges, and logging your eco-friendly activities.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">How do I redeem rewards?</p>
+                            <p class="text-gray-600 dark:text-gray-300">Navigate to the 'Store' tab to purchase a reward. Then, go to 'Orders' to find your active coupons and redeem them.</p>
+                        </div>
+                    </div>
+                    <div class="border-t dark:border-gray-700 pt-6 mt-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Contact Us</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-2">
+                            For further assistance, please email us at
+                            <a href="#" class="text-green-600 dark:text-green-400 font-medium">support@greencampus.edu</a>.
+                        </p>
+                    </div>
+                </div>
             </div>
+
             <div id="change-password" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Change Password</h2>
                 <div class="glass-card p-6 rounded-2xl">
                     <form id="change-password-form" class="space-y-6">
-                        <input id="new-password" type="password" required class="w-full border px-3 py-2 rounded-lg" placeholder="New Password">
+                        <div>
+                            <label for="new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                            <div class="mt-1">
+                                <input id="new-password" name="new-password" type="password" required
+                                       class="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white"
+                                       placeholder="••••••••">
+                            </div>
+                        </div>
+
                         <div id="password-message" class="text-sm text-center"></div>
-                        <button type="submit" id="change-password-button" class="w-full btn-eco-gradient text-white font-bold py-3 rounded-lg">Update</button>
+
+                        <div>
+                            <button type="submit" id="change-password-button"
+                                    class="w-full flex justify-center py-3 px-4 rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
+                                Update Password
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
+
         </main>
 
-        <!-- Chatbot FAB -->
         <button onclick="openChatbotModal()" id="chatbot-btn" class="fixed z-20 bottom-24 right-6 w-16 h-16 flex items-center justify-center hover:scale-105 transition-transform">
-             <img src="[https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png](https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png)" alt="EcoBot" class="w-full h-full object-contain drop-shadow-xl">
+             <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" alt="EcoBot" class="w-full h-full object-contain drop-shadow-xl">
         </button>
 
-        <!-- Bottom Navigation -->
         <nav class="glass-bottom-bar border-t border-gray-200/70 dark:border-gray-800">
             <div class="flex justify-around">
-                <button onclick="showPage('dashboard')" class="nav-item active flex-1 text-center py-3 text-gray-600 hover:text-green-500"><i data-lucide="layout-dashboard" class="w-6 h-6 mx-auto"></i><span class="text-xs mt-1">Dashboard</span></button>
-                <button onclick="showPage('leaderboard')" class="nav-item flex-1 text-center py-3 text-gray-600 hover:text-green-500"><i data-lucide="users" class="w-6 h-6 mx-auto"></i><span class="text-xs mt-1">Leaderboard</span></button>
-                <button onclick="showPage('challenges')" class="nav-item flex-1 text-center py-3 text-gray-600 hover:text-green-500"><i data-lucide="award" class="w-6 h-6 mx-auto"></i><span class="text-xs mt-1">Challenges</span></button>
-                <button onclick="showPage('rewards')" class="nav-item flex-1 text-center py-3 text-gray-600 hover:text-green-500"><i data-lucide="gift" class="w-6 h-6 mx-auto"></i><span class="text-xs mt-1">Store</span></button>
+                <button onclick="showPage('dashboard')" class="nav-item active flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Dashboard</span>
+                </button>
+                <button onclick="showPage('leaderboard')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400">
+                    <i data-lucide="users" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Leaderboard</span>
+                </button>
+                <button onclick="showPage('challenges')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400">
+                    <i data-lucide="award" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Challenges</span>
+                </button>
+                <button onclick="showPage('rewards')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400">
+                    <i data-lucide="gift" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Store</span>
+                </button>
             </div>
         </nav>
     </div>
 
-    <!-- Modals -->
     <div id="checkin-modal" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 invisible" onclick="closeCheckinModal()">
         <div id="checkin-modal-content" class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md p-6 transform translate-y-full" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Daily Check-in</h3><button onclick="closeCheckinModal()"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <p id="checkin-modal-streak" class="text-center text-5xl font-extrabold text-yellow-600 mb-6">0 Days</p>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Daily Check-in</h3>
+                <button onclick="closeCheckinModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-2">Your current streak:</p>
+            <p id="checkin-modal-streak" class="text-center text-5xl font-extrabold text-yellow-600 dark:text-yellow-400 mb-6">0 Days</p>
+
             <div id="checkin-modal-calendar" class="flex justify-center space-x-2 mb-6"></div>
             <div id="checkin-modal-button-container"></div>
         </div>
     </div>
 
     <div id="purchase-modal-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="closePurchaseModal()"></div>
-    <div id="purchase-modal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-t-2xl z-50 p-6 transform translate-y-full transition-transform"></div>
+    <div id="purchase-modal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-t-2xl z-50 p-6 transform translate-y-full transition-transform duration-300 ease-in-out"></div>
 
     <div id="qr-modal-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="closeQrModal()"></div>
-    <div id="qr-modal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-t-2xl z-50 p-6 transform translate-y-full transition-transform"></div>
+    <div id="qr-modal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-t-2xl z-50 p-6 transform translate-y-full transition-transform duration-300 ease-in-out"></div>
 
     <div id="chatbot-modal" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 invisible" onclick="closeChatbotModal()">
         <div id="chatbot-modal-content" class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md h-[70vh] flex flex-col transform translate-y-full" onclick="event.stopPropagation()">
-            <div class="p-4 border-b flex justify-between items-center"><h3 class="font-bold">EcoBot</h3><button onclick="closeChatbotModal()"><i data-lucide="x"></i></button></div>
-            <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto"></div>
-            <div class="p-4 border-t"><form id="chatbot-form" class="flex"><input id="chatbot-input" type="text" class="w-full border rounded-full px-3 py-2" placeholder="Ask me..."><button type="submit" class="ml-2 bg-green-600 text-white p-2 rounded-full"><i data-lucide="send"></i></button></form></div>
-        </div>
-    </div>
-
-    <!-- Modern Quiz Modal -->
-    <div id="quiz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center opacity-0 invisible transition-all duration-300">
-        <div id="quiz-modal-content" class="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-sm p-6 transform scale-90 transition-transform duration-300 shadow-2xl border-4 border-purple-500/30 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-pink-500"></div>
-            
-            <button onclick="closeQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
-            
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i data-lucide="brain" class="w-8 h-8 text-purple-600 dark:text-purple-400"></i>
-                </div>
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Eco Quiz</h3>
-                <p class="text-sm text-purple-600 dark:text-purple-400 font-semibold" id="quiz-date">Today's Challenge</p>
+            <div class="flex-shrink-0 flex justify-between items-center p-4 border-b dark:border-gray-700">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                    <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" alt="Bot" class="w-8 h-8 mr-2 object-contain">
+                    EcoBot
+                </h3>
+                <button onclick="closeChatbotModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-
-            <div id="quiz-loading" class="text-center py-8"><p class="animate-pulse text-gray-500">Loading Question...</p></div>
-
-            <div id="quiz-body" class="hidden">
-                <p id="quiz-question" class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-6 text-center">...</p>
-                <div id="quiz-options" class="space-y-3">
-                    <!-- Options injected here -->
+            <div id="chatbot-messages" class="flex-grow p-4 space-y-4 overflow-y-auto">
+                <div class="flex">
+                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs">
+                        <p class="text-sm text-gray-800 dark:text-gray-100">Hi! I'm EcoBot. How can I help you with your sustainability questions today?</p>
+                    </div>
                 </div>
             </div>
-
-            <div id="quiz-result" class="hidden text-center py-4">
-                <i id="quiz-result-icon" data-lucide="check-circle" class="w-16 h-16 mx-auto mb-2 text-green-500"></i>
-                <h4 id="quiz-result-title" class="text-xl font-bold mb-1">Correct!</h4>
-                <p id="quiz-result-msg" class="text-sm text-gray-600 dark:text-gray-300">You earned 10 EcoPoints.</p>
-                <button onclick="closeQuizModal()" class="mt-4 w-full bg-gray-200 text-gray-800 font-bold py-3 rounded-xl">Close</button>
+            <div class="flex-shrink-0 p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-800">
+                <form id="chatbot-form" class="flex items-center space-x-2">
+                    <input id="chatbot-input" type="text" placeholder="Ask about recycling..." class="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-full focus:outline-none focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white">
+                    <button type="submit" class="bg-green-600 text-white p-2.5 rounded-full">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Camera Modal (Updated) -->
+    <div id="eco-quiz-modal" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 invisible" onclick="closeEcoQuizModal()">
+        <div id="eco-quiz-modal-content" class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md p-6 transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <div>
+                    <span class="text-xs font-bold uppercase text-green-600 dark:text-green-400 tracking-wider bg-green-50 dark:bg-green-900/40 px-2 py-1 rounded-md">Daily Quiz</span>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mt-1">Eco Knowledge</h3>
+                </div>
+                <button onclick="closeEcoQuizModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="eco-quiz-modal-body">
+                <p id="eco-quiz-modal-question" class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6 leading-relaxed">
+                    </p>
+                <div id="eco-quiz-modal-options" class="space-y-3">
+                    </div>
+                <div id="eco-quiz-modal-result" class="hidden text-center mt-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="camera-modal" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
-        <div class="relative flex-grow bg-black overflow-hidden">
+        <div class="relative flex-grow bg-black">
             <video id="camera-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
             <canvas id="camera-canvas" class="hidden"></canvas>
         </div>
         <div class="bg-black p-6 pb-10 flex justify-around items-center">
-            <button onclick="closeCameraModal()" class="text-white p-4 rounded-full bg-gray-800 hover:bg-gray-700 transition">
+            <button onclick="closeCameraModal()" class="text-white p-4 rounded-full bg-gray-800">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
-            <button onclick="capturePhoto()" class="p-1 rounded-full border-4 border-white transition-transform active:scale-95">
+            <button onclick="capturePhoto()" class="p-1 rounded-full border-4 border-white">
                 <div class="w-16 h-16 bg-white rounded-full"></div>
             </button>
-            <button onclick="switchCamera()" class="text-white p-4 rounded-full bg-gray-800 hover:bg-gray-700 transition">
+            <button onclick="switchCamera()" class="text-white p-4 rounded-full bg-gray-800">
                 <i data-lucide="refresh-cw" class="w-6 h-6"></i>
             </button>
         </div>
