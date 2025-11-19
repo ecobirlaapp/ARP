@@ -94,28 +94,34 @@ themeBtn.addEventListener('click', () => {
 const savedTheme = localStorage.getItem('eco-theme');
 applyTheme(savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches));
 
-// Forms
-document.getElementById('change-password-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msgEl = document.getElementById('password-message');
-    msgEl.textContent = 'Feature hidden for demo.';
-});
+// Forms with Safety Checks
+const changePwdForm = document.getElementById('change-password-form');
+if (changePwdForm) {
+    changePwdForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgEl = document.getElementById('password-message');
+        if(msgEl) msgEl.textContent = 'Feature hidden for demo.';
+    });
+}
 
-document.getElementById('redeem-code-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const code = document.getElementById('redeem-input').value;
-    const msgEl = document.getElementById('redeem-message');
-    const btn = document.getElementById('redeem-submit-btn');
-    btn.disabled = true; msgEl.textContent = 'Redeeming...';
-    try {
-        const { data, error } = await supabase.rpc('redeem_coupon', { p_code: code });
-        if (error) throw error;
-        msgEl.textContent = `Success! You earned ${data.points_awarded} points.`; msgEl.classList.add('text-green-500');
-        document.getElementById('redeem-input').value = '';
-        await refreshUserData(); 
-    } catch (err) { msgEl.textContent = `Error: ${err.message}`; msgEl.classList.add('text-red-500'); } 
-    finally { btn.disabled = false; setTimeout(() => { msgEl.textContent = ''; msgEl.classList.remove('text-red-500', 'text-green-500'); }, 3000); }
-});
+const redeemForm = document.getElementById('redeem-code-form');
+if (redeemForm) {
+    redeemForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('redeem-input').value;
+        const msgEl = document.getElementById('redeem-message');
+        const btn = document.getElementById('redeem-submit-btn');
+        btn.disabled = true; msgEl.textContent = 'Redeeming...';
+        try {
+            const { data, error } = await supabase.rpc('redeem_coupon', { p_code: code });
+            if (error) throw error;
+            msgEl.textContent = `Success! You earned ${data.points_awarded} points.`; msgEl.classList.add('text-green-500');
+            document.getElementById('redeem-input').value = '';
+            await refreshUserData(); 
+        } catch (err) { msgEl.textContent = `Error: ${err.message}`; msgEl.classList.add('text-red-500'); } 
+        finally { btn.disabled = false; setTimeout(() => { msgEl.textContent = ''; msgEl.classList.remove('text-red-500', 'text-green-500'); }, 3000); }
+    });
+}
 
 // Attach logout to window for backup access
 window.handleLogout = handleLogout;
