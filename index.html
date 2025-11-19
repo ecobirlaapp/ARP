@@ -73,7 +73,7 @@
         <div class="p-4">
             <button id="logout-button" class="w-full bg-red-100 text-red-700 font-bold py-3 px-4 rounded-lg hover:bg-red-200 dark:bg-red-800 dark:text-red-100 dark:hover:bg-red-700 flex items-center justify-center"><i data-lucide="log-out" class="w-5 h-5 mr-2"></i><span>Log Out</span></button>
         </div>
-        <div class="p-6 border-t border-gray-200 dark:border-gray-700"><p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v8.3</p></div>
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700"><p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v8.6</p></div>
     </div>
 
     <div class="app-container bg-white dark:bg-gray-950 h-full flex flex-col">
@@ -169,7 +169,7 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Test your knowledge (+10 pts)</p>
                             </div>
                         </div>
-                        <button onclick="openEcoQuizModal()" class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-500 shadow-md shadow-brand-500/30">Play Now</button>
+                        <button id="btn-quiz-play" onclick="openEcoQuizModal()" class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-500 shadow-md shadow-brand-500/30">Play Now</button>
                     </div>
                 </div>
 
@@ -217,8 +217,8 @@
                     </form>
                 </div>
             </div>
-
-            <div id="change-password" class="page p-6">
+            
+             <div id="change-password" class="page p-6">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Change Password</h2>
                 <div class="glass-card p-6 rounded-2xl">
                     <form id="change-password-form" class="space-y-6">
@@ -228,6 +228,7 @@
                     </form>
                 </div>
             </div>
+
 
             <div id="store-detail-page" class="page dark:bg-gray-900"></div>
             <div id="product-detail-page" class="page dark:bg-gray-900"></div>
@@ -258,7 +259,7 @@
         <nav class="glass-bottom-bar border-t border-gray-200/70 dark:border-gray-800 fixed bottom-0 w-full max-w-[420px] z-30">
             <div class="flex justify-around">
                 <button onclick="showPage('dashboard')" class="nav-item active flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"><i data-lucide="layout-dashboard" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Home</span></button>
-                <button onclick="showPage('events')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"><i data-lucide="calendar" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Events</span></button>
+                <button onclick="showPage('leaderboard')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"><i data-lucide="users" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Leaderboard</span></button>
                 <button onclick="showPage('challenges')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"><i data-lucide="camera" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Action</span></button>
                 <button onclick="showPage('rewards')" class="nav-item flex-1 text-center py-3 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"><i data-lucide="gift" class="w-6 h-6 mx-auto"></i><span class="text-xs block mt-1">Store</span></button>
             </div>
@@ -290,7 +291,7 @@
     </div>
 
     <div id="participants-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center opacity-0 invisible transition-all duration-300" onclick="closeParticipantsModal()">
-        <div id="participants-modal-content" class="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[70vh] sm:h-[600px] flex flex-col transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300" onclick="event.stopPropagation()">
+        <div id="participants-modal-content" class="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[70vh] sm:h-[600px] flex flex-col transform translate-y-full sm:scale-95 transition-transform duration-300 ease-in-out" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"><h3 class="text-lg font-bold text-gray-900 dark:text-white">Who's Going</h3><button onclick="closeParticipantsModal()" class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button></div>
             <div id="participants-list" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
         </div>
