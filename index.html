@@ -63,6 +63,7 @@
             <div class="pt-2 border-t border-gray-200 dark:border-gray-700"></div>
             <button onclick="showPage('about')" class="sidebar-nav-item w-full flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i data-lucide="info" class="w-5 h-5 mr-3"></i>About Us</button>
             <button onclick="showPage('help')" class="sidebar-nav-item w-full flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i data-lucide="help-circle" class="w-5 h-5 mr-3"></i>Help & Support</button>
+            <button onclick="showPage('change-password')" class="sidebar-nav-item w-full flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i data-lucide="key-round" class="w-5 h-5 mr-3"></i>Change Password</button>
             <div class="pt-2 border-t border-gray-200 dark:border-gray-700"></div>
             <div class="flex items-center justify-between p-3 rounded-lg text-gray-700 dark:text-gray-300">
                 <div class="flex items-center"><i id="theme-icon" data-lucide="sun" class="w-5 h-5 mr-3"></i><span id="theme-text">Light Mode</span></div>
@@ -72,7 +73,7 @@
         <div class="p-4">
             <button id="logout-button" class="w-full bg-red-100 text-red-700 font-bold py-3 px-4 rounded-lg hover:bg-red-200 dark:bg-red-800 dark:text-red-100 dark:hover:bg-red-700 flex items-center justify-center"><i data-lucide="log-out" class="w-5 h-5 mr-2"></i><span>Log Out</span></button>
         </div>
-        <div class="p-6 border-t border-gray-200 dark:border-gray-700"><p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v8.2</p></div>
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700"><p class="text-xs text-center text-gray-400 dark:text-gray-500">EcoCampus v8.3</p></div>
     </div>
 
     <div class="app-container bg-white dark:bg-gray-950 h-full flex flex-col">
@@ -213,6 +214,17 @@
                         <div><label for="redeem-input" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">10-Digit Code</label><input id="redeem-input" name="redeem-input" type="text" maxlength="10" required class="w-full border-2 border-gray-300 dark:border-gray-600 px-4 py-3 rounded-xl text-center text-2xl tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white placeholder-gray-300 dark:placeholder-gray-500" placeholder="XXXXXXXXXX"></div>
                         <div id="redeem-message" class="text-sm text-center h-5"></div>
                         <button type="submit" id="redeem-submit-btn" class="w-full btn-eco-gradient text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:opacity-90 transform transition-transform active:scale-95">Redeem Points</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="change-password" class="page p-6">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Change Password</h2>
+                <div class="glass-card p-6 rounded-2xl">
+                    <form id="change-password-form" class="space-y-6">
+                        <div><label for="new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label><div class="mt-1"><input id="new-password" name="new-password" type="password" required class="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white" placeholder="••••••••"></div></div>
+                        <div id="password-message" class="text-sm text-center"></div>
+                        <div><button type="submit" id="change-password-button" class="w-full flex justify-center py-3 px-4 rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">Update Password</button></div>
                     </form>
                 </div>
             </div>
