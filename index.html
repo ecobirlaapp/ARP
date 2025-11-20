@@ -296,8 +296,8 @@
     
     <div id="chatbot-modal" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 invisible" onclick="closeChatbotModal()">
         <div id="chatbot-modal-content" class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md h-[70vh] flex flex-col transform translate-y-full" onclick="event.stopPropagation()">
-            <div class="flex-shrink-0 flex justify-between items-center p-4 border-b dark:border-gray-700"><h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center"><img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" alt="Bot" class="w-8 h-8 mr-2 object-contain">EcoBot</h3><button onclick="closeChatbotModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <div id="chatbot-messages" class="flex-grow p-4 space-y-4 overflow-y-auto"><div class="flex"><div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs"><p class="text-sm text-gray-800 dark:text-gray-100">Hi! I'm EcoBot. How can I help you with your sustainability questions today?</p></div></div></div>
+            <div class="flex-shrink-0 flex justify-between items-center p-4 border-b dark:border-gray-700"><h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center"><img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" alt="Bot" class="w-8 h-8 mr-2 object-contain">EcoBuddy</h3><button onclick="closeChatbotModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <div id="chatbot-messages" class="flex-grow p-4 space-y-4 overflow-y-auto"><div class="flex"><div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs"><p class="text-sm text-gray-800 dark:text-gray-100">Hi! I'm EcoBuddy. How can I help you with your sustainability questions today?</p></div></div></div>
             <div class="flex-shrink-0 p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-800"><form id="chatbot-form" class="flex items-center space-x-2"><input id="chatbot-input" type="text" placeholder="Ask about recycling..." class="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-full focus:outline-none focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white"><button type="submit" class="bg-green-600 text-white p-2.5 rounded-full"><i data-lucide="send" class="w-5 h-5"></i></button></form></div>
         </div>
     </div>
@@ -325,5 +325,6 @@
     </div>
 
     <script type="module" src="app.js"></script> 
+    <script type="module" src="chatbot.js"></script>
 </body>
 </html>
