@@ -18,6 +18,7 @@ export const loadDashboardData = async () => {
             supabase.from('user_impact').select('*').eq('user_id', userId).single()
         ]);
         
+        // Store these in the state object so they persist
         state.currentUser.isCheckedInToday = (checkinData && checkinData.length > 0);
         state.currentUser.checkInStreak = streakData ? streakData.current_streak : 0;
         state.currentUser.impact = impactData || { total_plastic_kg: 0, co2_saved_kg: 0, events_attended: 0 };
@@ -50,17 +51,24 @@ const renderDashboardUI = () => {
 };
 
 const renderCheckinButtonState = () => {
+    // Use 0 as fallback if undefined
     const streak = state.currentUser.checkInStreak || 0;
-    document.getElementById('dashboard-streak-text-pre').textContent = streak;
-    document.getElementById('dashboard-streak-text-post').textContent = streak;
+    
+    // Update both Pre (before checkin) and Post (after checkin) streak counters
+    const preEl = document.getElementById('dashboard-streak-text-pre');
+    const postEl = document.getElementById('dashboard-streak-text-post');
+    if(preEl) preEl.textContent = streak;
+    if(postEl) postEl.textContent = streak;
     
     const btn = els.dailyCheckinBtn;
     if (state.currentUser.isCheckedInToday) {
         btn.classList.add('checkin-completed'); 
+        // Remove gradient to show the "Great Job" styling
         btn.classList.remove('from-yellow-400', 'to-orange-400', 'dark:from-yellow-500', 'dark:to-orange-500', 'bg-gradient-to-r');
         btn.onclick = null; 
     } else {
         btn.classList.remove('checkin-completed');
+        // Add gradient back
         btn.classList.add('from-yellow-400', 'to-orange-400', 'dark:from-yellow-500', 'dark:to-orange-500', 'bg-gradient-to-r');
         btn.onclick = openCheckinModal;
     }
@@ -69,6 +77,7 @@ const renderCheckinButtonState = () => {
 export const openCheckinModal = () => {
     if (state.currentUser.isCheckedInToday) return;
     const checkinModal = document.getElementById('checkin-modal');
+    checkinModal.classList.add('open');
     checkinModal.classList.remove('invisible', 'opacity-0');
     
     const calendarContainer = document.getElementById('checkin-modal-calendar');
@@ -84,7 +93,7 @@ export const openCheckinModal = () => {
             </div>
         `;
     }
-    document.getElementById('checkin-modal-streak').textContent = `${state.currentUser.checkInStreak} Days`;
+    document.getElementById('checkin-modal-streak').textContent = `${state.currentUser.checkInStreak || 0} Days`;
     document.getElementById('checkin-modal-button-container').innerHTML = `
         <button onclick="handleDailyCheckin()" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-700 shadow-lg transition-transform active:scale-95">
             Check-in &amp; Earn ${state.checkInReward} Points
@@ -94,6 +103,7 @@ export const openCheckinModal = () => {
 
 export const closeCheckinModal = () => {
     const checkinModal = document.getElementById('checkin-modal');
+    checkinModal.classList.remove('open');
     checkinModal.classList.add('invisible', 'opacity-0');
 };
 
@@ -102,13 +112,32 @@ export const handleDailyCheckin = async () => {
     checkinButton.disabled = true;
     checkinButton.textContent = 'Checking in...';
 
+    // 1. Calculate Optimistic Values
+    // We calculate this NOW before any fetches happen
+    const optimisticStreak = (state.currentUser.checkInStreak || 0) + 1;
+
     try {
-        const { error } = await supabase.from('daily_checkins').insert({ user_id: state.currentUser.id, points_awarded: state.checkInReward });
+        // 2. DB Insert
+        const { error } = await supabase.from('daily_checkins').insert({ 
+            user_id: state.currentUser.id, 
+            points_awarded: state.checkInReward 
+        });
         if (error) throw error;
-        state.currentUser.isCheckedInToday = true;
+
+        // 3. Close Modal
         closeCheckinModal();
-        await Promise.all([refreshUserData(), loadDashboardData()]);
+
+        // 4. Update Points (This wipes state.currentUser.checkInStreak because it reloads user object)
+        await refreshUserData(); 
+
+        // 5. RESTORE OPTIMISTIC STATE
+        // Since refreshUserData() replaced the user object, we must put the streak back manually
+        state.currentUser.checkInStreak = optimisticStreak;
+        state.currentUser.isCheckedInToday = true;
+
+        // 6. Force Re-render of the button with restored data
         renderCheckinButtonState();
+
     } catch (err) {
         console.error('Check-in error:', err.message);
         alert(`Failed to check in: ${err.message}`);
