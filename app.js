@@ -108,21 +108,53 @@ const redeemForm = document.getElementById('redeem-code-form');
 if (redeemForm) {
     redeemForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const code = document.getElementById('redeem-input').value;
+        
+        // Get value and trim whitespace
+        const codeInput = document.getElementById('redeem-input');
+        const code = codeInput.value.trim();
+        
         const msgEl = document.getElementById('redeem-message');
         const btn = document.getElementById('redeem-submit-btn');
-        btn.disabled = true; msgEl.textContent = 'Redeeming...';
+        
+        // UI Loading State
+        btn.disabled = true; 
+        btn.innerText = 'Verifying...'; 
+        msgEl.textContent = '';
+        msgEl.className = 'text-sm text-center h-5'; // Reset classes
+
         try {
+            // Call the SQL function 'redeem_coupon'
             const { data, error } = await supabase.rpc('redeem_coupon', { p_code: code });
+            
             if (error) throw error;
-            msgEl.textContent = `Success! You earned ${data.points_awarded} points.`; msgEl.classList.add('text-green-500');
-            document.getElementById('redeem-input').value = '';
+            
+            // Success State
+            msgEl.textContent = `Success! You earned ${data.points_awarded} points.`; 
+            msgEl.classList.add('text-green-600', 'font-bold');
+            codeInput.value = ''; // Clear input
+            
+            // Refresh user points in header/sidebar
             await refreshUserData(); 
-        } catch (err) { msgEl.textContent = `Error: ${err.message}`; msgEl.classList.add('text-red-500'); } 
-        finally { btn.disabled = false; setTimeout(() => { msgEl.textContent = ''; msgEl.classList.remove('text-red-500', 'text-green-500'); }, 3000); }
+            
+        } catch (err) { 
+            // Error State
+            console.error("Redemption Error:", err);
+            // Show specific database error or generic message
+            msgEl.textContent = err.message || "Invalid or expired code."; 
+            msgEl.classList.add('text-red-500', 'font-bold'); 
+        } finally { 
+            // Reset Button
+            btn.disabled = false; 
+            btn.innerText = 'Redeem Points';
+            
+            // Clear message after 4 seconds
+            setTimeout(() => { 
+                msgEl.textContent = ''; 
+                msgEl.classList.remove('text-red-500', 'text-green-600', 'font-bold'); 
+            }, 4000); 
+        }
     });
 }
-
 // Attach logout to window for backup access
 window.handleLogout = handleLogout;
 
