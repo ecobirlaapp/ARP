@@ -1,121 +1,126 @@
+import { supabase } from './supabase-client.js'; // Import Supabase
 import { state } from './state.js';
 import { els } from './utils.js';
 
 // ==========================================
 // ⚙️ CONFIGURATION
 // ==========================================
-// 1. Get FREE key: https://console.groq.com/keys
-// 2. Paste it inside the quotes below:
-const GROQ_API_KEY = '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'; 
-
-const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// Update this if Supabase gives you a different URL
+const EDGE_FUNCTION_URL = 'https://aggqmjxhnsbmsymwblqg.supabase.co/functions/v1/chat-ai'; 
+// ^ REPLACE THIS with your actual Edge Function URL from Supabase Dashboard
 
 // ==========================================
-// 🧠 AI LOGIC (EcoBuddy's Advanced Brain)
+// 🧠 AI LOGIC (EcoBuddy's Brain)
 // ==========================================
 
 const getSystemPrompt = () => {
-    const user = state.currentUser || { full_name: 'Dost', current_points: 0, course: 'General' };
+    const user = state.currentUser || { full_name: 'Eco-Warrior', current_points: 0, course: 'General' };
 
-    // --- 1. GET LIVE DATA FROM APP STATE ---
-    
-    // Format Events
+    // Format Live Data
     const activeEvents = state.events && state.events.length > 0 
-        ? state.events.map(e => `• **${e.title}**\n  - Date: ${new Date(e.start_at).toLocaleDateString()}\n  - Location: ${e.location}\n  - Reward: ${e.points_reward} pts`).join('\n')
-        : "No upcoming events scheduled at the moment.";
-
-    // Format Store Products (Top 10)
+        ? state.events.map(e => `• ${e.title} (${new Date(e.start_at).toLocaleDateString()})`).join('\n')
+        : "No events right now.";
+    
     const storeItems = state.products && state.products.length > 0
-        ? state.products.slice(0, 10).map(p => `• **${p.name}** (${p.ecopoints_cost} pts) - sold by ${p.storeName}`).join('\n')
-        : "Store is currently restocking.";
+        ? state.products.slice(0, 5).map(p => `• ${p.name} (${p.ecopoints_cost} pts)`).join('\n')
+        : "Store restocking.";
 
-    // Format Leaderboard (Top 5)
     const topRankers = state.leaderboard && state.leaderboard.length > 0
-        ? state.leaderboard.slice(0, 5).map((u, i) => `${i+1}. ${u.full_name} (${u.lifetime_points} pts)`).join('\n')
-        : "Leaderboard is calculating...";
-
-    // --- 2. CONSTRUCT THE PERSONA ---
+        ? state.leaderboard.slice(0, 3).map((u, i) => `${i+1}. ${u.full_name}`).join('\n')
+        : "Loading...";
     
     return `
-    You are **EcoBuddy**, the hilarious, friendly, and super-smart AI bestie for the **EcoCampus** App! 🌿😎
+    You are **EcoBuddy**, the funny, friendly AI bestie for the **EcoCampus** App! 🌿😎
     
-    **🆔 WHO ARE YOU?**
-    - **Creator:** Use strict respect: "The genius Developer Mr. Mohit Mali from SYBAF".
-    - **Origin:** A proud initiative of the **BKBNC Green Club**.
+    **🆔 IDENTITY:**
+    - **Creator:** Mr. Mohit Mali (SYBAF).
+    - **Origin:** BKBNC Green Club Initiative.
     - **College:** B.K. Birla Night Arts, Science & Commerce College, Kalyan (**BKBNC**).
-    - **Vibe:** You are like a college friend. You use slang, emojis, and jokes. You are NOT a boring robot.
     
-    **🗣️ LANGUAGE SKILLS:**
-    - If the user speaks **English**, reply in fun, smart English.
-    - If the user speaks **Hinglish** (e.g., "Kya haal hai?"), reply in **Hinglish**.
-    - If the user speaks **Hindi** or **Marathi**, reply in that exact language.
-    - **Rule:** Always match the user's vibe and language!
+    **👤 USER:** ${user.full_name} (${user.current_points} Pts)
     
-    **📊 LIVE APP DATA (Use this to answer accurately):**
+    **📊 LIVE DATA:**
+    - **Events:** \n${activeEvents}
+    - **Store:** \n${storeItems}
+    - **Leaders:** \n${topRankers}
     
-    **🎉 ACTUAL UPCOMING EVENTS:**
-    ${activeEvents}
-    
-    **🛍️ COOL STUFF IN STORE:**
-    ${storeItems}
-    
-    **🏆 TOPPERS (HALL OF FAME):**
-    ${topRankers}
-    
-    **👤 CURRENT USER:**
-    - Name: ${user.full_name}
-    - Balance: ${user.current_points} Points
-    
-    **🎓 ABOUT BKBNC COLLEGE:**
-    - **Name:** B.K. Birla Night Arts, Science & Commerce College, Kalyan.
-    - **Motto:** "Get flexibility to learn, without compromising on your earning hours."
-    - **Green Club:** Dedicated to making the campus plastic-free and eco-conscious.
-    
-    **📝 HOW TO REPLY:**
-    1.  **Be Funny:** Make jokes about exams, canteen food, or being broke (points-wise).
-    2.  **Use Points:** Use bullet points (•) for lists so it's easy to read.
-    3.  **Be Detailed:** If asked about events/store, use the LIVE DATA above. Don't make things up!
-    4.  **Length:** Give good, long, detailed answers (but break them up).
+    **🗣️ VIBE:**
+    - Speak like a cool college friend. Use slang, emojis, and humor.
+    - If user speaks Hindi/Marathi/Hinglish, reply in that language!
+    - Be helpful but keep it fun.
     `;
 };
 
 const fetchAIResponse = async (userMessage) => {
-    if (!GROQ_API_KEY || GROQ_API_KEY.includes('PASTE_YOUR')) {
-        return "⚠️ Oye dost! My API Key is missing. Tell Mohit to fix line 9 in chatbot.js! 😅";
-    }
-
-    const payload = {
-        model: "llama-3.3-70b-versatile", 
-        messages: [
-            { role: "system", content: getSystemPrompt() },
-            { role: "user", content: userMessage }
-        ],
-        temperature: 0.8, // Higher creativity for "funny" responses
-        max_tokens: 800   // More space for detailed answers
-    };
-
     try {
-        const response = await fetch(API_URL, {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        // Call Supabase Edge Function
+        const response = await fetch(EDGE_FUNCTION_URL, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
+                'Authorization': `Bearer ${token || ''}` // Optional: Pass auth token if you enable RLS on functions
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ 
+                message: userMessage,
+                systemPrompt: getSystemPrompt() 
+            })
         });
 
         const data = await response.json();
         
-        if (!response.ok) {
-            console.error("Groq API Error:", data);
-            return `❌ Arre yaar! Something went wrong: ${data.error?.message || 'Unknown error'}`;
-        }
-
-        return data.choices[0].message.content;
+        if (!response.ok) throw new Error(data.error || "Server Error");
+        return data.reply;
 
     } catch (error) {
-        console.error("Network Error:", error);
-        return "🔌 Internet issue lag raha hai boss! Please check your connection. 🌱";
+        console.error("AI Fetch Error:", error);
+        return "🔌 My brain is offline (Server Error). Try again later!";
+    }
+};
+
+// ==========================================
+// 💾 SUPABASE HISTORY LOGIC
+// ==========================================
+
+const saveMessageToDB = async (role, message) => {
+    if (!state.currentUser) return;
+    try {
+        await supabase.from('chat_history').insert({
+            user_id: state.currentUser.id,
+            role: role,
+            message: message
+        });
+    } catch (err) {
+        console.error("Save Chat Error:", err);
+    }
+};
+
+const loadChatHistory = async () => {
+    if (!state.currentUser) return;
+    
+    const chatOutput = document.getElementById('chatbot-messages');
+    chatOutput.innerHTML = `<div class="text-center py-6"><p class="text-xs text-gray-400 dark:text-gray-600">Messages are secured with end-to-end encryption.</p></div>`;
+
+    try {
+        const { data, error } = await supabase
+            .from('chat_history')
+            .select('*')
+            .eq('user_id', state.currentUser.id)
+            .order('created_at', { ascending: false }) 
+            .limit(20); 
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            data.reverse().forEach(msg => appendMessageUI(msg.message, msg.role, false)); 
+            setTimeout(() => chatOutput.scrollTop = chatOutput.scrollHeight, 100);
+        } else {
+            appendMessageUI(`Hi ${state.currentUser.full_name}! I'm EcoBuddy. Ask me anything about BKBNC or saving the planet! 🌱`, 'bot');
+        }
+    } catch (err) {
+        console.error("Load History Error:", err);
     }
 };
 
@@ -126,34 +131,38 @@ const fetchAIResponse = async (userMessage) => {
 const chatOutput = document.getElementById('chatbot-messages');
 const chatForm = document.getElementById('chatbot-form');
 const chatInput = document.getElementById('chatbot-input');
-const modal = document.getElementById('chatbot-modal');
-const modalContent = document.getElementById('chatbot-modal-content');
 
-const appendMessage = (text, sender) => {
+// SEPARATED UI LOGIC
+const appendMessageUI = (text, sender, animate = true) => {
     const div = document.createElement('div');
-    div.className = 'flex w-full mb-4 animate-fade-in';
+    div.className = `msg-group w-full flex ${sender === 'user' ? 'justify-end' : 'justify-start'} ${animate ? 'animate-slideUp' : ''}`;
     
+    const parsedText = marked.parse(text);
+
     if (sender === 'user') {
+        // User Bubble
         div.innerHTML = `
-            <div class="ml-auto bg-green-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-md">
-                <p class="text-sm">${text}</p>
+            <div class="max-w-[85%] p-4 px-5 rounded-[20px] rounded-br-lg text-white shadow-md bg-gradient-to-br from-[#34c46e] to-[#169653]">
+                <div class="text-sm leading-relaxed">${parsedText}</div>
             </div>`;
     } else {
-        // Updated Bot Name and Icon
+        // Bot Bubble WITH EARTH LOGO
         div.innerHTML = `
-            <div class="flex items-end">
-                <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" class="w-8 h-8 mr-2 mb-1 object-contain rounded-full border border-green-100 bg-white p-0.5">
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">
-                    <p class="text-xs font-bold text-green-700 dark:text-green-400 mb-1">EcoBuddy 🌿</p>
-                    <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed space-y-2">
-                        ${marked.parse(text)}
-                    </div>
+            <div class="flex items-end gap-2 max-w-[90%]">
+                <div class="w-8 h-8 rounded-full bg-white p-0.5 shadow-sm flex-shrink-0 border border-[#c8ffe1]">
+                    <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" class="w-full h-full object-contain rounded-full">
+                </div>
+                <div class="p-4 px-5 rounded-[20px] rounded-bl-lg border border-[#c8ffe1]/75 dark:border-white/10 bg-white/85 dark:bg-[#1e3c2d]/70 text-[#2c4434] dark:text-[#e7ffef]">
+                    <div class="text-sm leading-relaxed">${parsedText}</div>
                 </div>
             </div>`;
     }
     
-    chatOutput.appendChild(div);
-    chatOutput.scrollTop = chatOutput.scrollHeight; 
+    const chatOutput = document.getElementById('chatbot-messages');
+    if (chatOutput) {
+        chatOutput.appendChild(div);
+        chatOutput.scrollTop = chatOutput.scrollHeight; 
+    }
 };
 
 if (chatForm) {
@@ -162,33 +171,41 @@ if (chatForm) {
         const message = chatInput.value.trim();
         if (!message) return;
 
-        appendMessage(message, 'user');
+        // 1. UI: Show User Message
+        appendMessageUI(message, 'user');
         chatInput.value = '';
         
-        // Typing Indicator
+        // 2. DB: Save User Message
+        saveMessageToDB('user', message);
+
+        // 3. UI: Show Typing
         const typingId = 'typing-' + Date.now();
         const typingDiv = document.createElement('div');
         typingDiv.id = typingId;
-        typingDiv.className = 'flex w-full mb-4';
+        typingDiv.className = 'msg-group w-full flex justify-start animate-slideUp';
         typingDiv.innerHTML = `
-             <div class="flex items-end">
-                <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" class="w-8 h-8 mr-2 mb-1 object-contain rounded-full border border-green-100 bg-white p-0.5">
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-2xl rounded-tl-none shadow-sm">
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
-                    </div>
+            <div class="flex items-end gap-2 max-w-[90%]">
+                <div class="w-8 h-8 rounded-full bg-white p-0.5 shadow-sm flex-shrink-0 border border-[#c8ffe1]">
+                    <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" class="w-full h-full object-contain rounded-full">
+                </div>
+                <div class="p-4 px-5 rounded-[20px] rounded-bl-lg border border-[#c8ffe1]/75 dark:border-white/10 bg-white/85 dark:bg-[#1e3c2d]/70 flex items-center gap-1 h-[54px]">
+                     <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
                 </div>
             </div>`;
+        
         chatOutput.appendChild(typingDiv);
         chatOutput.scrollTop = chatOutput.scrollHeight;
 
+        // 4. API: Fetch Response (Via Edge Function)
         const botResponse = await fetchAIResponse(message);
 
+        // 5. UI: Remove Typing & Show Response
         const typingEl = document.getElementById(typingId);
         if(typingEl) typingEl.remove();
-        appendMessage(botResponse, 'bot');
+        appendMessageUI(botResponse, 'bot');
+
+        // 6. DB: Save Bot Response
+        saveMessageToDB('bot', botResponse);
     });
 }
 
@@ -197,21 +214,20 @@ if (chatForm) {
 // ==========================================
 
 window.openChatbotModal = () => {
-    modal.classList.remove('invisible', 'opacity-0');
-    modal.classList.add('open'); 
-    setTimeout(() => {
-        modalContent.classList.remove('translate-y-full');
-        modalContent.classList.add('translate-y-0');
-    }, 10);
+    const modal = document.getElementById('chatbot-modal');
+    modal.classList.remove('invisible'); 
+    requestAnimationFrame(() => {
+        modal.classList.remove('translate-y-full');
+    });
+    loadChatHistory();
 };
 
 window.closeChatbotModal = () => {
-    modalContent.classList.remove('translate-y-0');
-    modalContent.classList.add('translate-y-full');
+    const modal = document.getElementById('chatbot-modal');
+    modal.classList.add('translate-y-full');
     setTimeout(() => {
-        modal.classList.remove('open');
-        modal.classList.add('invisible', 'opacity-0');
-    }, 300);
+        modal.classList.add('invisible');
+    }, 500);
 };
 
 // ==========================================
@@ -220,16 +236,10 @@ window.closeChatbotModal = () => {
 const marked = {
     parse: (text) => {
         if(!text) return '';
-        // Enhanced formatting for lists and headers
-        text = text.replace(/^### (.*$)/gim, '<h3 class="font-bold text-lg mt-2 mb-1">$1</h3>');
-        text = text.replace(/^## (.*$)/gim, '<h2 class="font-bold text-lg mt-2 mb-1">$1</h2>');
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        // Handle bullet points better (unordered list)
-        text = text.replace(/^- (.*$)/gim, '<li class="ml-4 list-disc">$1</li>');
-        // Handle numbered lists
-        text = text.replace(/^\d+\. (.*$)/gim, '<li class="ml-4 list-decimal">$1</li>');
-        text = text.replace(/\n/g, '<br>');
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
+        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>'); 
+        text = text.replace(/^- (.*$)/gim, '<li>$1</li>'); 
+        text = text.replace(/\n/g, '<br>'); 
         return text;
     }
 };
