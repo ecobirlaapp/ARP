@@ -4,7 +4,7 @@ import { renderRewards, renderMyRewardsPage } from './store.js';
 import { renderHistory } from './dashboard.js';
 import { renderEcoPointsPage } from './store.js';
 import { renderChallengesPage } from './challenges.js';
-import { renderEventsPage } from './events.js'; // Import from new file
+import { renderEventsPage } from './events.js'; 
 import { renderProfile } from './dashboard.js';
 import { showLeaderboardTab } from './social.js';
 
@@ -64,10 +64,26 @@ export const getUserLevel = (points) => {
     return { ...current, progress, progressText };
 };
 
-export const formatDate = (dateString, options = { year: 'numeric', month: 'short', day: 'numeric' }) => {
-    if (!dateString) return '...';
-    return new Date(dateString).toLocaleDateString('en-US', options);
+// --- NEW: IST DATE LOGIC ---
+
+// 1. Get Today's Date string (YYYY-MM-DD) specifically for IST
+export const getTodayIST = () => {
+    // 'en-CA' format is always YYYY-MM-DD
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 };
+
+// 2. Format any date string to show in IST
+export const formatDate = (dateString, options = {}) => {
+    if (!dateString) return '...';
+    const defaultOptions = { 
+        year: 'numeric', month: 'short', day: 'numeric',
+        timeZone: 'Asia/Kolkata' // FORCE IST
+    };
+    const finalOptions = { ...defaultOptions, ...options };
+    return new Date(dateString).toLocaleDateString('en-IN', finalOptions);
+};
+
+// ---------------------------
 
 export const getIconForHistory = (type) => {
     const icons = { 'checkin': 'calendar-check', 'event': 'calendar-check', 'challenge': 'award', 'plastic': 'recycle', 'order': 'shopping-cart', 'coupon': 'ticket', 'quiz': 'brain' };
@@ -97,20 +113,17 @@ export const uploadToCloudinary = async (file) => {
     } catch (err) { console.error("Cloudinary Upload Error:", err); throw err; }
 };
 
-// Navigation Logic
 export const showPage = (pageId, addToHistory = true) => {
     els.pages.forEach(p => p.classList.remove('active'));
     
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.add('active');
 
-    // Reset detail pages if navigating away
     if (!['store-detail-page', 'product-detail-page'].includes(pageId)) {
         els.storeDetailPage.innerHTML = ''; els.productDetailPage.innerHTML = '';
     }
     if (pageId !== 'department-detail-page') els.departmentDetailPage.innerHTML = '';
 
-    // Active Nav State
     document.querySelectorAll('.nav-item, .sidebar-nav-item').forEach(btn => {
         const onclickVal = btn.getAttribute('onclick');
         btn.classList.toggle('active', onclickVal && onclickVal.includes(`'${pageId}'`));
@@ -118,12 +131,10 @@ export const showPage = (pageId, addToHistory = true) => {
 
     document.querySelector('.main-content').scrollTop = 0;
 
-    // Handle Mobile Back Button Logic
     if (addToHistory) {
         window.history.pushState({ pageId: pageId }, '', `#${pageId}`);
     }
 
-    // Page Specific Renders
     if (pageId === 'dashboard') { if(els.lbLeafLayer) els.lbLeafLayer.classList.add('hidden'); renderDashboard(); } 
     else if (pageId === 'leaderboard') { showLeaderboardTab('student'); } 
     else if (pageId === 'rewards') { if(els.lbLeafLayer) els.lbLeafLayer.classList.add('hidden'); window.renderRewardsWrapper && window.renderRewardsWrapper(); } 
@@ -135,16 +146,15 @@ export const showPage = (pageId, addToHistory = true) => {
     else if (pageId === 'profile') { if(els.lbLeafLayer) els.lbLeafLayer.classList.add('hidden'); renderProfile(); }
     else { if(els.lbLeafLayer) els.lbLeafLayer.classList.add('hidden'); }
 
-    toggleSidebar(true); // Close sidebar if open
+    toggleSidebar(true); 
     if(window.lucide) window.lucide.createIcons();
 };
 
-// Handle Back Button Event
 window.addEventListener('popstate', (event) => {
     if (event.state && event.state.pageId) {
         showPage(event.state.pageId, false);
     } else {
-        showPage('dashboard', false); // Default fallback
+        showPage('dashboard', false); 
     }
 });
 
