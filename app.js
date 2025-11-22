@@ -58,9 +58,18 @@ const redirectToLogin = () => { window.location.replace('login.html'); };
 
 export const refreshUserData = async () => {
     try {
-         const { data: userProfile, error } = await supabase.from('users').select('*').eq('id', state.currentUser.id).single();
+        const { data: userProfile, error } = await supabase.from('users').select('*').eq('id', state.currentUser.id).single();
         if (error || !userProfile) return;
-        state.currentUser = userProfile;
+        
+        // Preserving local state (Check-in status, streaks) so they don't disappear on refresh
+        const existingState = {
+            isCheckedInToday: state.currentUser.isCheckedInToday,
+            checkInStreak: state.currentUser.checkInStreak,
+            impact: state.currentUser.impact
+        };
+
+        state.currentUser = { ...userProfile, ...existingState };
+
         const header = document.getElementById('user-points-header');
         header.classList.add('points-pulse'); header.textContent = userProfile.current_points;
         document.getElementById('user-points-sidebar').textContent = userProfile.current_points;
@@ -94,60 +103,87 @@ themeBtn.addEventListener('click', () => {
 const savedTheme = localStorage.getItem('eco-theme');
 applyTheme(savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches));
 
-// Forms with Safety Checks
+// --- FORM LOGIC ---
+
+// 1. Change Password Form (Fixed)
 const changePwdForm = document.getElementById('change-password-form');
 if (changePwdForm) {
     changePwdForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        const passwordInput = document.getElementById('new-password');
+        const newPassword = passwordInput.value;
         const msgEl = document.getElementById('password-message');
-        if(msgEl) msgEl.textContent = 'Feature hidden for demo.';
+        const btn = document.getElementById('change-password-button');
+
+        // Validation
+        if (newPassword.length < 6) {
+             msgEl.textContent = 'Password must be at least 6 characters.';
+             msgEl.className = 'text-sm text-center text-red-500 font-bold';
+             return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Updating...';
+        msgEl.textContent = '';
+
+        try {
+            const { data, error } = await supabase.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) throw error;
+
+            msgEl.textContent = 'Password updated successfully!';
+            msgEl.className = 'text-sm text-center text-green-600 font-bold';
+            passwordInput.value = ''; 
+
+        } catch (err) {
+            console.error('Password Update Error:', err);
+            msgEl.textContent = err.message || 'Failed to update password.';
+            msgEl.className = 'text-sm text-center text-red-500 font-bold';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Update Password';
+            setTimeout(() => { if (msgEl.textContent.includes('success')) msgEl.textContent = ''; }, 3000);
+        }
     });
 }
 
+// 2. Redeem Code Form (Fixed with IST & RPC)
 const redeemForm = document.getElementById('redeem-code-form');
 if (redeemForm) {
     redeemForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Get value and trim whitespace
         const codeInput = document.getElementById('redeem-input');
         const code = codeInput.value.trim();
-        
         const msgEl = document.getElementById('redeem-message');
         const btn = document.getElementById('redeem-submit-btn');
         
-        // UI Loading State
         btn.disabled = true; 
         btn.innerText = 'Verifying...'; 
         msgEl.textContent = '';
-        msgEl.className = 'text-sm text-center h-5'; // Reset classes
+        msgEl.className = 'text-sm text-center h-5'; 
 
         try {
-            // Call the SQL function 'redeem_coupon'
             const { data, error } = await supabase.rpc('redeem_coupon', { p_code: code });
             
             if (error) throw error;
             
-            // Success State
             msgEl.textContent = `Success! You earned ${data.points_awarded} points.`; 
             msgEl.classList.add('text-green-600', 'font-bold');
-            codeInput.value = ''; // Clear input
+            codeInput.value = ''; 
             
-            // Refresh user points in header/sidebar
             await refreshUserData(); 
             
         } catch (err) { 
-            // Error State
             console.error("Redemption Error:", err);
-            // Show specific database error or generic message
             msgEl.textContent = err.message || "Invalid or expired code."; 
             msgEl.classList.add('text-red-500', 'font-bold'); 
         } finally { 
-            // Reset Button
             btn.disabled = false; 
             btn.innerText = 'Redeem Points';
-            
-            // Clear message after 4 seconds
             setTimeout(() => { 
                 msgEl.textContent = ''; 
                 msgEl.classList.remove('text-red-500', 'text-green-600', 'font-bold'); 
@@ -155,6 +191,7 @@ if (redeemForm) {
         }
     });
 }
+
 // Attach logout to window for backup access
 window.handleLogout = handleLogout;
 
