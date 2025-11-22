@@ -24,6 +24,12 @@ html, body {
 *, *::before, *::after {
     box-shadow: none !important;
 }
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
 
 /* Re-enable shadows only for specific elements */
 .shadow-lg, .champ, .badge, .list .item, .btn-eco-gradient {
@@ -697,4 +703,44 @@ header, nav {
         transform: translateY(-2px);
         box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
     }
+}
+
+/* =========================================
+   9. CHATBOT UI STYLES
+   ========================================= */
+
+/* Message Animation */
+@keyframes slideUp {
+    from { transform: translateY(15px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.animate-slideUp {
+    animation: slideUp 0.35s ease forwards;
+}
+
+/* Floating Orbs */
+@keyframes float {
+    0% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(40px,30px) scale(1.1); }
+    100% { transform: translate(0,0) scale(1); }
+}
+.animate-float {
+    animation: float 18s infinite ease-in-out;
+}
+
+/* Typing Animation Dots */
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #10B981;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+    margin: 0 2px;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
 }
