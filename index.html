@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- UPDATED VIEWPORT: interactive-widget=resizes-content helps with keyboard resizing -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>EcoCampus - Green Initiative</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css"> 
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -18,6 +19,7 @@
                 extend: {
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
                     },
                     colors: {
                         brand: { 
@@ -28,13 +30,17 @@
                             700: '#4338ca',
                             900: '#312e81'
                         }
+                    },
+                    animation: {
+                        'float': 'float 18s infinite ease-in-out',
+                        'slideUp': 'slideUp 0.35s ease forwards',
                     }
                 },
             },
         }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body class="bg-gray-50 dark:bg-gray-900 font-inter h-[100dvh] overflow-hidden"> <!-- Ensure body fits viewport -->
     <input type="file" id="profile-upload-input" accept="image/*" class="hidden">
 
     <div id="app-loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-900">
@@ -44,6 +50,7 @@
         <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-4">EcoCampus Initiative</p>
     </div>
 
+    <!-- SIDEBAR & OTHER MODALS REMAIN UNCHANGED... -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 opacity-0 hidden"></div>
     
     <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white dark:bg-gray-800 z-40 transform -translate-x-full flex flex-col shadow-2xl transition-transform duration-300">
@@ -86,7 +93,7 @@
         </header>
 
         <main class="main-content bg-gray-50 dark:bg-gray-900 flex-grow overflow-y-auto pb-24">
-            
+            <!-- DASHBOARD & OTHER PAGES -->
             <div id="dashboard" class="page active p-6">
                  <div class="mb-8"><h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Hi, <span id="user-name-greeting">...</span>!</h2><p class="text-lg text-gray-600 dark:text-gray-400">Let's make our campus greener today.</p></div>
                  
@@ -211,7 +218,9 @@
                     <div class="flex justify-center mb-6"><div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center"><i data-lucide="ticket" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i></div></div>
                     <p class="text-center text-gray-600 dark:text-gray-300 mb-6">Got a special code from an event or challenge? Enter it below to claim your bonus EcoPoints!</p>
                     <form id="redeem-code-form" class="space-y-6">
-                        <div><label for="redeem-input" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Enter Code</label><input id="redeem-input" name="redeem-input" type="text" required class="w-full border-2 border-gray-300 dark:border-gray-600 px-4 py-3 rounded-xl text-center text-2xl tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white placeholder-gray-300 dark:placeholder-gray-500" placeholder="XXXXXXXXXX"></div>
+                        <div><label for="redeem-input" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">10-Digit Code</label>
+                            <input id="redeem-input" name="redeem-input" type="text" required class="w-full border-2 border-gray-300 dark:border-gray-600 px-4 py-3 rounded-xl text-center text-xl font-bold uppercase focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white placeholder-gray-300 dark:placeholder-gray-500" placeholder="ENTER CODE HERE">
+                        </div>
                         <div id="redeem-message" class="text-sm text-center h-5"></div>
                         <button type="submit" id="redeem-submit-btn" class="w-full btn-eco-gradient text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:opacity-90 transform transition-transform active:scale-95">Redeem Points</button>
                     </form>
@@ -294,34 +303,51 @@
     <div id="qr-modal-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="closeQrModal()"></div>
     <div id="qr-modal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-t-2xl z-50 p-6 transform translate-y-full transition-transform duration-300 ease-in-out"></div>
     
-    <div id="chatbot-modal" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 invisible" onclick="closeChatbotModal()">
-        <div id="chatbot-modal-content" class="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md h-[70vh] flex flex-col transform translate-y-full" onclick="event.stopPropagation()">
-            <div class="flex-shrink-0 flex justify-between items-center p-4 border-b dark:border-gray-700"><h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center"><img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" alt="Bot" class="w-8 h-8 mr-2 object-contain">EcoBuddy</h3><button onclick="closeChatbotModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <div id="chatbot-messages" class="flex-grow p-4 space-y-4 overflow-y-auto"><div class="flex"><div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs"><p class="text-sm text-gray-800 dark:text-gray-100">Hi! I'm EcoBuddy. How can I help you with your sustainability questions today?</p></div></div></div>
-            <div class="flex-shrink-0 p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-800"><form id="chatbot-form" class="flex items-center space-x-2"><input id="chatbot-input" type="text" placeholder="Ask about recycling..." class="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-full focus:outline-none focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 dark:text-white"><button type="submit" class="bg-green-600 text-white p-2.5 rounded-full"><i data-lucide="send" class="w-5 h-5"></i></button></form></div>
+    <!-- CHATBOT MODAL (Flex Layout Fix) -->
+    <div id="chatbot-modal" class="fixed inset-0 z-[60] bg-[#e6f7ed] dark:bg-[#07180f] transition-transform duration-500 translate-y-full invisible flex flex-col h-[100dvh] w-full font-jakarta">
+        
+        <!-- Background Orbs -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-60px] left-[-50px] w-[350px] h-[350px] rounded-full bg-[#c4f7d2] dark:bg-[#0e3e2a] blur-[90px] opacity-60 animate-float"></div>
+            <div class="absolute bottom-[-80px] right-[-60px] w-[450px] h-[450px] rounded-full bg-[#dafee9] dark:bg-[#0f5137] blur-[90px] opacity-60 animate-float delay-[-5s]"></div>
         </div>
-    </div>
 
-    <div id="eco-quiz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center opacity-0 invisible transition-all duration-300">
-        <div id="eco-quiz-modal-content" class="bg-white dark:bg-gray-900 rounded-3xl w-[90%] max-w-md p-6 transform scale-95 transition-transform duration-300 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 to-purple-500"></div>
-            <div class="flex justify-between items-start mb-6"><div><span class="text-xs font-bold text-brand-600 dark:text-brand-500 uppercase tracking-wide">Daily Challenge</span><h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-1">Eco Quiz</h3></div><button onclick="closeEcoQuizModal()" class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button></div>
-            <div id="eco-quiz-loading" class="text-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600 mx-auto"></div></div>
-            <div id="eco-quiz-body" class="hidden"><p id="eco-quiz-question" class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-6 leading-relaxed">...</p><div id="eco-quiz-options" class="space-y-3 mb-6"></div><div id="eco-quiz-feedback" class="hidden p-4 rounded-xl text-center font-bold mb-4 animate-pulse"></div></div>
-            <div id="eco-quiz-already-played" class="hidden text-center py-8"><div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check" class="w-8 h-8 text-green-600"></i></div><h4 class="text-xl font-bold text-gray-900 dark:text-white">Quiz Completed!</h4><p class="text-gray-500 dark:text-gray-400 mt-2">Come back tomorrow for a new question.</p></div>
+        <!-- Header (Flex Shrink 0) -->
+        <header class="relative z-10 h-[72px] flex-shrink-0 flex items-center justify-between px-6 bg-white/60 dark:bg-[#143723]/50 backdrop-blur-xl border-b border-[#c8ffe1]/75 dark:border-black/40 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-[0_6px_18px_rgba(0,128,60,0.35)] overflow-hidden border-2 border-white">
+                        <!-- EARTH LOGO HERE -->
+                        <img src="https://i.ibb.co/7xwsMnBc/Pngtree-green-earth-globe-clip-art-16672659-1.png" class="w-full h-full object-contain">
+                    </div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#34c46e] dark:bg-[#3af89b] border-2 border-[#e6f7ed] dark:border-[#07180f]"></div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-[#163626] dark:text-[#dff7e8]">EcoBuddy</h2>
+                    <p class="text-xs text-[#6f8c79] dark:text-[#97c7a9]">Always Online</p>
+                </div>
+            </div>
+            
+            <button onclick="closeChatbotModal()" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-red-100 text-[#163626] dark:text-[#dff7e8] hover:text-red-500 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </header>
+
+        <!-- Chat Feed (Flex Grow 1) -->
+        <div id="chatbot-messages" class="relative z-10 flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+            <!-- Messages will be injected here -->
         </div>
-    </div>
 
-    <div id="participants-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center opacity-0 invisible transition-all duration-300" onclick="closeParticipantsModal()">
-        <div id="participants-modal-content" class="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[70vh] sm:h-[600px] flex flex-col transform translate-y-full sm:scale-95 transition-transform duration-300 ease-in-out" onclick="event.stopPropagation()">
-            <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center"><h3 class="text-lg font-bold text-gray-900 dark:text-white">Who's Going</h3><button onclick="closeParticipantsModal()" class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-            <div id="participants-list" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
+        <!-- Input Container (Flex Shrink 0) -->
+        <div class="flex-shrink-0 p-5 bg-gradient-to-t from-[#e6f7ed] dark:from-[#07180f] to-transparent z-20 w-full">
+            
+            <form id="chatbot-form" class="flex items-center p-2 pl-5 bg-white/60 dark:bg-[#143723]/50 backdrop-blur-xl border border-[#c8ffe1]/75 dark:border-black/40 rounded-full shadow-lg w-full">
+                <input id="chatbot-input" type="text" placeholder="Ask something eco-friendly..." class="flex-1 bg-transparent border-none outline-none text-[#163626] dark:text-[#dff7e8] placeholder-[#6f8c79] dark:placeholder-[#97c7a9] text-base min-w-0" autocomplete="off">
+                <button type="submit" class="flex-shrink-0 w-[46px] h-[46px] rounded-full flex items-center justify-center text-white text-lg shadow-md bg-gradient-to-br from-[#34c46e] to-[#169653] hover:scale-105 active:scale-95 transition-transform">
+                    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                </button>
+            </form>
         </div>
-    </div>
-
-    <div id="camera-modal" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
-        <div class="relative flex-grow bg-black overflow-hidden"><video id="camera-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video><canvas id="camera-canvas" class="hidden"></canvas><button onclick="closeCameraModal()" class="absolute top-6 left-6 z-20 text-white bg-black/40 p-2 rounded-full backdrop-blur-md"><i data-lucide="arrow-left" class="w-6 h-6"></i></button></div>
-        <div class="bg-black p-8 pb-12 flex justify-around items-center"><button onclick="switchCamera()" class="text-white p-4 rounded-full bg-gray-800/80 backdrop-blur-sm active:scale-95 transition-transform"><i data-lucide="refresh-cw" class="w-6 h-6"></i></button><button onclick="capturePhoto()" class="p-1 rounded-full border-4 border-white active:scale-95 transition-transform"><div class="w-16 h-16 bg-white rounded-full"></div></button><div class="w-14"></div></div>
     </div>
 
     <script type="module" src="app.js"></script> 
