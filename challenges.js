@@ -5,7 +5,6 @@ import { els, getIconForChallenge, uploadToCloudinary, getTodayIST } from './uti
 // 1. Load Challenges
 export const loadChallengesData = async () => {
     try {
-        // UPDATED: Select 'frequency' from challenges
         const { data: challenges, error: challengeError } = await supabase
             .from('challenges')
             .select('id, title, description, points_reward, type, frequency')
@@ -13,7 +12,6 @@ export const loadChallengesData = async () => {
             
         if (challengeError) throw challengeError;
 
-        // UPDATED: Select 'created_at' to check dates
         const { data: submissions, error: subError } = await supabase
             .from('challenge_submissions')
             .select('challenge_id, status, created_at')
@@ -21,28 +19,31 @@ export const loadChallengesData = async () => {
             
         if (subError) throw subError;
 
-        const todayIST = getTodayIST(); // e.g., "2025-11-21"
+        const todayIST = getTodayIST(); // "YYYY-MM-DD" in IST
 
         state.dailyChallenges = challenges.map(c => {
-            // Get all submissions for this challenge
+            // Get all submissions for this specific challenge
             const challengeSubs = submissions.filter(s => s.challenge_id === c.id);
             
             let sub = null;
 
             if (c.frequency === 'daily') {
-                // For Daily: Find a submission created TODAY (in IST)
+                // ✅ KEY FIX: Only find submissions made TODAY.
+                // If I made a submission yesterday (even if pending/verified), this returns undefined for today.
+                // So 'sub' will be null, and I can upload again.
                 sub = challengeSubs.find(s => {
                     const subDate = new Date(s.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
                     return subDate === todayIST;
                 });
             } else {
-                // For Once: Just check if ANY submission exists
+                // For 'once', any submission counts
                 sub = challengeSubs[0];
             }
 
             let status = 'active', buttonText = 'Start', isDisabled = false;
             
             if (sub) {
+                // If we found a submission for TODAY:
                 if (sub.status === 'approved' || sub.status === 'verified') { 
                     status = 'completed'; 
                     buttonText = c.frequency === 'daily' ? 'Done for Today' : 'Completed'; 
@@ -58,18 +59,20 @@ export const loadChallengesData = async () => {
                     buttonText = 'Retry'; 
                 }
             } else {
+                // No submission found for today -> Allow Upload
                 if (c.type === 'Upload') buttonText = 'Take Photo';
             }
             
             return { ...c, icon: getIconForChallenge(c.type), status, buttonText, isDisabled };
         });
 
-        // Initialize Quiz Status Check
         checkQuizStatus();
 
         if (document.getElementById('challenges').classList.contains('active')) renderChallengesPage();
     } catch (err) { console.error('Challenges Load Error:', err); }
 };
+
+// ... (Rest of logic remains the same) ...
 
 // 2. Check Quiz Status Logic
 const checkQuizStatus = async () => {
@@ -78,10 +81,8 @@ const checkQuizStatus = async () => {
     if (!quizSection || !btn) return;
 
     try {
-        // Use Indian Date
         const today = getTodayIST();
         
-        // 1. Get Today's Quiz ID
         const { data: quiz, error: quizError } = await supabase
             .from('daily_quizzes')
             .select('id')
@@ -94,7 +95,6 @@ const checkQuizStatus = async () => {
             return;
         }
 
-        // 2. Check if user submitted this quiz
         const { data: submission, error: subError } = await supabase
             .from('quiz_submissions')
             .select('id')
@@ -102,7 +102,6 @@ const checkQuizStatus = async () => {
             .eq('user_id', state.currentUser.id)
             .maybeSingle();
 
-        // 3. Update UI
         quizSection.classList.remove('hidden');
         
         if (submission) {
@@ -124,7 +123,6 @@ const checkQuizStatus = async () => {
     }
 };
 
-// 3. Render Challenges Page
 export const renderChallengesPage = () => {
     els.challengesList.innerHTML = '';
 
@@ -152,7 +150,6 @@ export const renderChallengesPage = () => {
     if(window.lucide) window.lucide.createIcons();
 };
 
-// 4. Camera Logic
 let currentCameraStream = null;
 let currentChallengeIdForCamera = null;
 let currentFacingMode = 'environment';
@@ -161,6 +158,13 @@ export const startCamera = async (challengeId, facingMode = 'environment') => {
     currentChallengeIdForCamera = challengeId;
     currentFacingMode = facingMode;
     const modal = document.getElementById('camera-modal');
+    
+    // Safety check if modal is still missing for some reason
+    if(!modal) {
+        alert("Camera Error: Modal missing in HTML.");
+        return;
+    }
+    
     const video = document.getElementById('camera-feed');
     modal.classList.remove('hidden');
     
@@ -187,8 +191,9 @@ export const switchCamera = () => {
 export const closeCameraModal = () => {
     const modal = document.getElementById('camera-modal');
     if (currentCameraStream) currentCameraStream.getTracks().forEach(track => track.stop());
-    document.getElementById('camera-feed').srcObject = null;
-    modal.classList.add('hidden');
+    const video = document.getElementById('camera-feed');
+    if(video) video.srcObject = null;
+    if(modal) modal.classList.add('hidden');
 };
 
 export const capturePhoto = async () => {
@@ -226,7 +231,7 @@ export const capturePhoto = async () => {
     }, 'image/jpeg', 0.8);
 };
 
-// 5. Quiz Logic (Same as before, just ensuring exports)
+// Quiz Logic Exports
 let currentQuizId = null;
 
 export const openEcoQuizModal = async () => {
@@ -333,7 +338,8 @@ const submitQuizAnswer = async (selectedIndex, correctIndex, points) => {
 export const closeEcoQuizModal = () => {
     document.getElementById('eco-quiz-modal').classList.add('invisible', 'opacity-0');
     setTimeout(() => {
-         document.getElementById('eco-quiz-feedback').classList.add('hidden');
+         const fb = document.getElementById('eco-quiz-feedback');
+         if(fb) fb.classList.add('hidden');
     }, 300);
 };
 
