@@ -1,12 +1,16 @@
 import { supabase } from './supabase-client.js';
 import { state } from './state.js';
-import { els, formatDate, getIconForHistory, getPlaceholderImage, getTickImg, getUserInitials, getUserLevel, uploadToCloudinary } from './utils.js';
+import { els, formatDate, getIconForHistory, getPlaceholderImage, getTickImg, getUserInitials, getUserLevel, uploadToCloudinary, getTodayIST } from './utils.js';
 import { refreshUserData } from './app.js';
 
 export const loadDashboardData = async () => {
     try {
         const userId = state.currentUser.id;
-        const today = new Date().toISOString().split('T')[0];
+        
+        // ✅ FIX: Use IST Date instead of UTC (toISOString)
+        // Previous code: const today = new Date().toISOString().split('T')[0]; 
+        // This caused check-ins at 1 AM IST to count for the previous day.
+        const today = getTodayIST(); 
 
         const [
             { data: checkinData },
@@ -18,7 +22,6 @@ export const loadDashboardData = async () => {
             supabase.from('user_impact').select('*').eq('user_id', userId).single()
         ]);
         
-        // Store these in the state object so they persist
         state.currentUser.isCheckedInToday = (checkinData && checkinData.length > 0);
         state.currentUser.checkInStreak = streakData ? streakData.current_streak : 0;
         state.currentUser.impact = impactData || { total_plastic_kg: 0, co2_saved_kg: 0, events_attended: 0 };
@@ -51,10 +54,8 @@ const renderDashboardUI = () => {
 };
 
 const renderCheckinButtonState = () => {
-    // Use 0 as fallback if undefined
     const streak = state.currentUser.checkInStreak || 0;
     
-    // Update both Pre (before checkin) and Post (after checkin) streak counters
     const preEl = document.getElementById('dashboard-streak-text-pre');
     const postEl = document.getElementById('dashboard-streak-text-post');
     if(preEl) preEl.textContent = streak;
@@ -63,12 +64,10 @@ const renderCheckinButtonState = () => {
     const btn = els.dailyCheckinBtn;
     if (state.currentUser.isCheckedInToday) {
         btn.classList.add('checkin-completed'); 
-        // Remove gradient to show the "Great Job" styling
         btn.classList.remove('from-yellow-400', 'to-orange-400', 'dark:from-yellow-500', 'dark:to-orange-500', 'bg-gradient-to-r');
         btn.onclick = null; 
     } else {
         btn.classList.remove('checkin-completed');
-        // Add gradient back
         btn.classList.add('from-yellow-400', 'to-orange-400', 'dark:from-yellow-500', 'dark:to-orange-500', 'bg-gradient-to-r');
         btn.onclick = openCheckinModal;
     }
@@ -82,10 +81,15 @@ export const openCheckinModal = () => {
     
     const calendarContainer = document.getElementById('checkin-modal-calendar');
     calendarContainer.innerHTML = '';
+    
+    // ✅ FIX: Visual Calendar now centers on today's date
+    const today = new Date(); // Visuals can use local time, but logic uses IST
+    
     for (let i = -3; i <= 3; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
         const isToday = i === 0;
+        
         calendarContainer.innerHTML += `
             <div class="flex flex-col items-center text-xs ${isToday ? 'font-bold text-yellow-600 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'}">
                 <span class="mb-1">${['S','M','T','W','T','F','S'][d.getDay()]}</span>
@@ -112,30 +116,27 @@ export const handleDailyCheckin = async () => {
     checkinButton.disabled = true;
     checkinButton.textContent = 'Checking in...';
 
-    // 1. Calculate Optimistic Values
-    // We calculate this NOW before any fetches happen
     const optimisticStreak = (state.currentUser.checkInStreak || 0) + 1;
 
     try {
-        // 2. DB Insert
+        // ✅ FIX: Explicitly send the IST Date to the database
+        // This ensures the DB row has "2025-11-23" even if the server is in UTC
+        const todayIST = getTodayIST();
+
         const { error } = await supabase.from('daily_checkins').insert({ 
             user_id: state.currentUser.id, 
-            points_awarded: state.checkInReward 
+            points_awarded: state.checkInReward,
+            checkin_date: todayIST 
         });
         if (error) throw error;
 
-        // 3. Close Modal
         closeCheckinModal();
 
-        // 4. Update Points (This wipes state.currentUser.checkInStreak because it reloads user object)
         await refreshUserData(); 
 
-        // 5. RESTORE OPTIMISTIC STATE
-        // Since refreshUserData() replaced the user object, we must put the streak back manually
         state.currentUser.checkInStreak = optimisticStreak;
         state.currentUser.isCheckedInToday = true;
 
-        // 6. Force Re-render of the button with restored data
         renderCheckinButtonState();
 
     } catch (err) {
@@ -152,7 +153,9 @@ export const loadHistoryData = async () => {
         if (error) return;
         state.history = data.map(item => ({
             type: item.source_type, description: item.description, points: item.points_delta,
-            date: formatDate(item.created_at), icon: getIconForHistory(item.source_type)
+            // ✅ FIX: Format history dates in IST
+            date: formatDate(item.created_at), 
+            icon: getIconForHistory(item.source_type)
         }));
         if (document.getElementById('history').classList.contains('active')) renderHistory();
     } catch (err) { console.error('History Load Error:', err); }
