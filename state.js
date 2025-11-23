@@ -22,10 +22,12 @@ export let state = {
     dailyChallenges: [],
     events: [],
     userRewards: [],   
+    // ✅ UPDATED: Levels to match your screenshot
     levels: [
-        { level: 1, title: 'Green Starter', minPoints: 0, nextMin: 1001 },
-        { level: 2, title: 'Eco Learner', minPoints: 1001, nextMin: 2001 },
-        { level: 3, title: 'Sustainability Leader', minPoints: 2001, nextMin: 4001 },
+        { level: 1, title: 'Green Starter', minPoints: 0, nextMin: 1001, desc: "Just beginning your eco-journey. Every point counts!" },
+        { level: 2, title: 'Eco Learner', minPoints: 1001, nextMin: 2001, desc: "You're building green habits. Keep up the momentum!" },
+        { level: 3, title: 'Sustainability Leader', minPoints: 2001, nextMin: 4001, desc: "A true inspiration! You're making a real impact on campus." },
+        { level: 4, title: 'Planet Protector', minPoints: 4001, nextMin: Infinity, desc: "You've reached the pinnacle of green leadership. Amazing!" }
     ],
     currentUploadChallengeId: null 
 };
